@@ -14,19 +14,20 @@ dev_name = '/dev/serial/by-id/usb-RFXCOM_RFXtrx433_A1WYT9NA-if00-port0'
 # handler method which catches all packets we can specify a number of handlers
 # for the different packets we are interested in.
 def status_handler(packet):
-    print("Status :\n", packet.data, '\n')
+    # ignore.
+    return
 
 
 def elec_handler(packet):
-    print("Elec   :\n", packet.data, '\n')
+    print("Watts:", packet.data['current_watts'])
 
 
 def temp_humidity_handler(packet):
-    print("Temp   :\n", packet.data, '\n')
+    print("Temp :", packet.data['temperature'])
 
 
 def default_callback(bytes_):
-    print("????   :\n", list(bytes_), repr(bytes_), '\n')
+    print("???? :\n", list(bytes_), repr(bytes_), '\n')
 
 try:
     # To provide multiple callbacks we need to pass in a callbacks dict, the
