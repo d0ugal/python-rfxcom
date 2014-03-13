@@ -1,0 +1,11 @@
+language: python
+python: 2.7
+env:
+  - TOX_ENV=nose
+  - TOX_ENV=flake8
+install:
+  - pip install tox
+script:
+  - tox -e $TOX_ENV
+notifications:
+  irc: "chat.freenode.net#rfxcom"
