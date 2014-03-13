@@ -97,9 +97,6 @@ class Packet(BasePacketHandler):
     def can_handle(self, data):
         return True
 
-    def validate_packet(self, data):
-        return True
-
     def parse(self, data):
 
         packet_length = data[0]
