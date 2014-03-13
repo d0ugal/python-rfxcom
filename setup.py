@@ -1,8 +1,8 @@
-from __future__ import print_function
 import ast
-import os
 import codecs
-from setuptools import setup
+import os
+
+from setuptools import setup, find_packages
 
 
 class VersionFinder(ast.NodeVisitor):
@@ -35,7 +35,7 @@ setup(
     long_description=read('README.rst'),
     author='Dougal Matthews',
     author_email='dougal@dougalmatthews.com',
-    packages=['rfxcom'],
+    packages=find_packages(exclude=["tests"]),
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
