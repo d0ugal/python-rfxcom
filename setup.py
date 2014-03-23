@@ -36,6 +36,10 @@ setup(
     author='Dougal Matthews',
     author_email='dougal@dougalmatthews.com',
     packages=find_packages(exclude=["tests"]),
+    install_requires=[
+        'asyncio==0.4.1',
+        'pyserial==2.7'
+    ],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
