@@ -70,3 +70,7 @@ class Elec2TestCase(TestCase):
         data = self.data[11:16]
 
         self.assertEquals(self.parser.bytes_to_uint_48(data), 205957288)
+
+    def test_log_namer(self):
+
+        self.assertEquals(self.parser.log.name, 'rfxcom.protocol.Elec')

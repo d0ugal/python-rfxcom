@@ -5,6 +5,8 @@ class Elec(BasePacketHandler):
 
     def __init__(self):
 
+        super().__init__()
+
         self.PACKET_TYPES = {
             0x5A: "Energy usage sensors"
         }

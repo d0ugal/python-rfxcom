@@ -30,3 +30,8 @@ class BaseTestCase(TestCase):
 
         with self.assertRaises(NotImplementedError):
             self.parser.load(self.data)
+
+    def test_log_namer(self):
+
+        self.assertEquals(self.parser.log.name,
+                          'rfxcom.protocol.BasePacketHandler')

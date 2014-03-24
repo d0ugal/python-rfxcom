@@ -1,3 +1,6 @@
+from datetime import datetime
+from logging import getLogger
+
 from rfxcom.exceptions import (InvalidPacketLength, UnknownPacketType,
                                UnknownPacketSubtype, RFXComException)
 
@@ -10,6 +13,7 @@ class BasePacket:
 
     def __init__(self):
 
+        self.log = getLogger('rfxcom.protocol.%s' % self.__class__.__name__)
         self.PACKET_TYPES = {}
         self.SUB_TYPES = {}
 
@@ -34,6 +38,7 @@ class BasePacket:
         :return: The parsed data represented in a dictionary
         :rtype: dict
         """
+        self.loaded_at = datetime.utcnow()
         self.raw = data
         self.data = self.parse(data)
         return self.data
@@ -92,7 +97,7 @@ class BasePacketHandler(BasePacket):
         return True
 
 
-class Packet(BasePacketHandler):
+class Packet(BasePacket):
 
     def can_handle(self, data):
         return True

@@ -55,3 +55,7 @@ class StatusTestCase(TestCase):
 
         with self.assertRaises(UnknownPacketSubtype):
             self.parser.validate_packet(self.data)
+
+    def test_log_namer(self):
+
+        self.assertEquals(self.parser.log.name, 'rfxcom.protocol.Status')

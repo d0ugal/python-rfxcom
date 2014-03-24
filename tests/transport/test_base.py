@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import Mock, ANY
 
-from rfxcom.exceptions import PacketHandlerNotFound
+from rfxcom.exceptions import PacketHandlerNotFound, RFXComException
 from rfxcom.protocol import Elec
 from rfxcom.transport.base import BaseTransport
 
@@ -18,23 +18,23 @@ class BaseTestCase(TestCase):
 
     def setUp(self):
 
-        self.parser = BaseTransport(device=None, callback=_dummy_callback)
+        self.transport = BaseTransport(device=None, callback=_dummy_callback)
         self.bytes_array = bytearray(b'\x11\x5A\x01\x00\x2E\xB2\x03\x00\x00')
 
     def test_format_packet(self):
 
         bytes_array = bytearray(b'\x11\x5A\x01\x00\x2E\xB2\x03\x00\x00')
-        formatted = self.parser.format_packet(bytes_array)
+        formatted = self.transport.format_packet(bytes_array)
         expected = '0x11 0x5a 0x01 0x00 0x2e 0xb2 0x03 0x00 0x00'
 
         self.assertEquals(formatted, expected)
 
     def test_setup_callbacks_single(self):
 
-        self.assertEquals(self.parser.default_callback, _dummy_callback)
+        self.assertEquals(self.transport.default_callback, _dummy_callback)
 
         self.assertEquals(
-            self.parser.get_callback_parser(self.bytes_array),
+            self.transport.get_callback_parser(self.bytes_array),
             (_dummy_callback, ANY)
         )
 
@@ -81,6 +81,11 @@ class BaseTestCase(TestCase):
         with self.assertRaises(PacketHandlerNotFound):
             parser.get_callback_parser(self.bytes_array)
 
+    def test_no_callbacks(self):
+
+        with self.assertRaises(RFXComException):
+            BaseTransport(device=None)
+
     def test_do_callback(self):
 
         callback_mock = Mock()
@@ -102,4 +107,6 @@ class BaseTestCase(TestCase):
 
     def test_log(self):
 
-        self.parser.log(message="test")
+        self.transport.log.debug("test")
+        self.assertEquals(self.transport.log.name,
+                          'rfxcom.transport.BaseTransport')

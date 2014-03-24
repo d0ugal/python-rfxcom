@@ -42,7 +42,7 @@ class AsyncioTransport(BaseTransport):
         assert type(data) == bytes
 
         pkt = bytearray(data)
-        self.log("WRITE: %s" % self.format_packet(pkt))
+        self.log.info("WRITE: %s" % self.format_packet(pkt))
         self.dev.write(pkt)
 
     def reader(self):
@@ -58,7 +58,7 @@ class AsyncioTransport(BaseTransport):
                 pkt.extend(bytearray(data))
                 break
 
-        self.log("READ : %s" % self.format_packet(pkt))
+        self.log.info("READ : %s" % self.format_packet(pkt))
         self.do_callback(pkt)
 
     def do_callback(self, pkt):

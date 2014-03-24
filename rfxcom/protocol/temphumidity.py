@@ -5,6 +5,8 @@ class TempHumidity(BasePacketHandler):
 
     def __init__(self):
 
+        super().__init__()
+
         self.PACKET_TYPES = {
             0x52: "Interface message"
         }
@@ -37,7 +39,7 @@ class TempHumidity(BasePacketHandler):
 
         temperature = ((data[6] & 0x7f) * 256 + data[7]) / 10
         signbit = data[6] & 0x80
-        if signbit == 1:
+        if signbit != 0:
             temperature = -temperature
         humidity = data[8]
         humidity_status = data[9]

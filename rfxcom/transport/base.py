@@ -1,32 +1,26 @@
-from datetime import datetime
+from logging import getLogger
 
-from rfxcom.exceptions import PacketHandlerNotFound
+from rfxcom.exceptions import PacketHandlerNotFound, RFXComException
 from rfxcom.protocol import HANDLERS
-
-
-def n():
-    return datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 
 
 class BaseTransport:
 
     def __init__(self, device, callback=None, callbacks=None):
 
+        self.log = getLogger('rfxcom.transport.%s' % self.__class__.__name__)
         self.device = device
 
         self._setup_callbacks(callback, callbacks)
 
     def format_packet(self, pkt):
-        h = " ".join("0x{0:02x}".format(x) for x in pkt)
-        return "%s" % (h)
-
-    def log(self, message):
-        print(n(), message)
+        return " ".join("0x{0:02x}".format(x) for x in pkt)
 
     def _setup_callbacks(self, callback, callbacks):
 
         if callback is None and callbacks is None:
-            raise Exception("bleh")
+            raise RFXComException(
+                "Either callback or callbacks must be provided.")
         elif callbacks is None:
             self.callbacks = {}
             self.default_callback = callback

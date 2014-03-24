@@ -6,7 +6,7 @@ from rfxcom.exceptions import (InvalidPacketLength, UnknownPacketSubtype,
                                UnknownPacketType)
 
 
-class StatusTestCase(TestCase):
+class TempHumidityTestCase(TestCase):
 
     def setUp(self):
 
@@ -34,6 +34,17 @@ class StatusTestCase(TestCase):
             'battery_signal_level': 137,
         })
 
+    def test_negative_temp(self):
+
+        self.data = bytearray(b'\x0A\x52\x02\x11\x70\x02\x80\xA7'
+                              b'\x2D\x00\x89')
+
+        self.assertTrue(self.parser.validate_packet(self.data))
+        self.assertTrue(self.parser.can_handle(self.data))
+        result = self.parser.load(self.data)
+
+        self.assertEquals(result['temperature'], -16.7)
+
     def test_validate_bytes_short(self):
 
         data = self.data[:1]
@@ -58,3 +69,7 @@ class StatusTestCase(TestCase):
 
         with self.assertRaises(UnknownPacketSubtype):
             self.parser.validate_packet(self.data)
+
+    def test_log_name(self):
+
+        self.assertEquals(self.parser.log.name, 'rfxcom.protocol.TempHumidity')
