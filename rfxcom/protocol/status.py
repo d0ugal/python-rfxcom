@@ -5,7 +5,7 @@ class Status(BasePacketHandler):
 
     def __init__(self):
 
-        super().__init__()
+        super(Status, self).__init__()
 
         self.PACKET_TYPES = {
             0x01: "Interface message"

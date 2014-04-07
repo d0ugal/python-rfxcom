@@ -7,7 +7,8 @@ class AsyncioTransport(BaseTransport):
     def __init__(self, device, loop, callback=None, callbacks=None,
                  SerialClass=None):
 
-        super().__init__(device, callback=callback, callbacks=callbacks)
+        super(AsyncioTransport, self).__init__(
+            device, callback=callback, callbacks=callbacks)
 
         self.loop = loop
 

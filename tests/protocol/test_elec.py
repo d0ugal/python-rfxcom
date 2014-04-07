@@ -20,7 +20,7 @@ class Elec2TestCase(TestCase):
         self.assertTrue(self.parser.can_handle(self.data))
         result = self.parser.load(self.data)
 
-        self.assertEquals(result, {
+        self.assertEqual(result, {
             'battery_level': 17,
             'count': 3,
             'current_watts': 692,
@@ -69,8 +69,8 @@ class Elec2TestCase(TestCase):
 
         data = self.data[11:16]
 
-        self.assertEquals(self.parser.bytes_to_uint_48(data), 205957288)
+        self.assertEqual(self.parser.bytes_to_uint_48(data), 205957288)
 
     def test_log_namer(self):
 
-        self.assertEquals(self.parser.log.name, 'rfxcom.protocol.Elec')
+        self.assertEqual(self.parser.log.name, 'rfxcom.protocol.Elec')

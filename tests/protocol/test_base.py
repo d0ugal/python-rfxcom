@@ -33,5 +33,5 @@ class BaseTestCase(TestCase):
 
     def test_log_namer(self):
 
-        self.assertEquals(self.parser.log.name,
-                          'rfxcom.protocol.BasePacketHandler')
+        self.assertEqual(self.parser.log.name,
+                         'rfxcom.protocol.BasePacketHandler')

@@ -5,7 +5,7 @@ from rfxcom.exceptions import (InvalidPacketLength, UnknownPacketType,
                                UnknownPacketSubtype, RFXComException)
 
 
-class BasePacket:
+class BasePacket(object):
     """
     The base class for all packet handling classes. Provides a number of simple
     helper methods and outlines the API.

@@ -26,13 +26,25 @@ def find_version(*parts):
     finder.visit(ast.parse(read(*parts)))
     return finder.version
 
+
+tests_require = [
+    'nose==1.3.1'
+]
+
 install_requires = [
     'pyserial==2.7'
 ]
 
 # We only want to install asyncio on Python 3.3 - it comes with 3.4 and wont
 # work on earlier versions.
-if sys.version_info[:2] == (3, 3):
+if sys.version_info <= (3, 2):
+    install_requires.extend([
+        'trollius==0.2'
+    ])
+    tests_require.extend([
+        'mock'
+    ])
+elif sys.version_info[:2] == (3, 3):
     install_requires.append('asyncio==0.4.1')
 
 setup(
@@ -46,6 +58,7 @@ setup(
     author_email='dougal@dougalmatthews.com',
     packages=find_packages(exclude=["tests"]),
     install_requires=install_requires,
+    tests_require=tests_require,
     include_package_data=True,
     platforms='any',
     classifiers=[
@@ -58,4 +71,5 @@ setup(
         'Programming Language :: Python :: 3.4',
     ],
     zip_safe=False,
+    test_suite='nose.collector',
 )

@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from asyncio import get_event_loop
 
 from rfxcom.transport import AsyncioTransport

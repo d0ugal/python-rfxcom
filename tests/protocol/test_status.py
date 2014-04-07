@@ -20,7 +20,7 @@ class StatusTestCase(TestCase):
         self.assertTrue(self.parser.can_handle(self.data))
         result = self.parser.load(self.data)
 
-        self.assertEquals(result, {
+        self.assertEqual(result, {
             'packet_length': 13,
             'packet_type': 1,
             'sequence_number': 1,
@@ -58,4 +58,4 @@ class StatusTestCase(TestCase):
 
     def test_log_namer(self):
 
-        self.assertEquals(self.parser.log.name, 'rfxcom.protocol.Status')
+        self.assertEqual(self.parser.log.name, 'rfxcom.protocol.Status')

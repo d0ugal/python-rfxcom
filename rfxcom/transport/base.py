@@ -6,7 +6,7 @@ from rfxcom.exceptions import PacketHandlerNotFound, RFXComException
 from rfxcom.protocol import HANDLERS
 
 
-class BaseTransport:
+class BaseTransport(object):
 
     def __init__(self, device, callback=None, callbacks=None,
                  SerialClass=None):

@@ -20,7 +20,7 @@ class TempHumidityTestCase(TestCase):
         self.assertTrue(self.parser.can_handle(self.data))
         result = self.parser.load(self.data)
 
-        self.assertEquals(result, {
+        self.assertEqual(result, {
             'packet_length': 10,
             'packet_type': 82,
             'sequence_number': 17,
@@ -43,7 +43,7 @@ class TempHumidityTestCase(TestCase):
         self.assertTrue(self.parser.can_handle(self.data))
         result = self.parser.load(self.data)
 
-        self.assertEquals(result['temperature'], -16.7)
+        self.assertEqual(result['temperature'], -16.7)
 
     def test_validate_bytes_short(self):
 
@@ -72,4 +72,4 @@ class TempHumidityTestCase(TestCase):
 
     def test_log_name(self):
 
-        self.assertEquals(self.parser.log.name, 'rfxcom.protocol.TempHumidity')
+        self.assertEqual(self.parser.log.name, 'rfxcom.protocol.TempHumidity')
