@@ -28,24 +28,25 @@ def find_version(*parts):
 
 
 tests_require = [
-    'nose==1.3.1'
+    'nose'
 ]
 
 install_requires = [
     'pyserial==2.7'
 ]
 
-# We only want to install asyncio on Python 3.3 - it comes with 3.4 and wont
-# work on earlier versions.
-if sys.version_info <= (3, 2):
+if sys.version_info < (3, 3):
     install_requires.extend([
         'trollius==0.2'
     ])
     tests_require.extend([
         'mock'
     ])
-elif sys.version_info[:2] == (3, 3):
-    install_requires.append('asyncio==0.4.1')
+
+if sys.version_info < (3, 4):
+    install_requires.extend([
+        'asyncio==0.4.1'
+    ])
 
 setup(
     name="rfxcom",
@@ -67,6 +68,8 @@ setup(
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
     ],
