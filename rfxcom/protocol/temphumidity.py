@@ -1,3 +1,5 @@
+from __future__ import division
+
 from rfxcom.protocol.base import BasePacketHandler
 
 
@@ -37,7 +39,7 @@ class TempHumidity(BasePacketHandler):
         sequence_number = data[3]
         id_ = self.dump_hex(data[4:6])
 
-        temperature = ((data[6] & 0x7f) * 256 + data[7]) / 10.0
+        temperature = ((data[6] & 0x7f) * 256 + data[7]) / 10
         signbit = data[6] & 0x80
         if signbit != 0:
             temperature = -temperature
