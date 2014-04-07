@@ -16,7 +16,7 @@ def _callback2(*args, **kwargs):
     pass
 
 
-class BaseTestCase(TestCase):
+class BaseTransportTestCase(TestCase):
 
     def setUp(self):
 

@@ -1,11 +1,19 @@
 language: python
 python: 2.7
 env:
-  - TOX_ENV=nose
-  - TOX_ENV=flake8
+- TOX_ENV=nose
+- TOX_ENV=flake8
 install:
-  - pip install tox
+- pip install tox
 script:
-  - tox -e $TOX_ENV
+- tox -e $TOX_ENV
 notifications:
-  irc: "chat.freenode.net#rfxcom"
+  irc: chat.freenode.net#rfxcom
+deploy:
+  provider: pypi
+  user: rfxcom
+  password:
+    secure: FiexQvQX6xd5TwaNEXyPj2krOu9nRIFMZg8/lrGjsiMSiA/+MbjZfDKYypCPFr4BNNNCTbFiUVV6ea57gxreDU9UQGnj/9vZpyKIPHMLM8mF936sp31p4X2ClXVJM/di80yTOuFdU0pemzbkvMnN6CCvA4fJo3Q9GNkE1mH9tVU=
+  on:
+    tags: true
+    repo: d0ugal/rfxcom

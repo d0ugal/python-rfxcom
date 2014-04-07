@@ -11,6 +11,7 @@ class AsyncioTransport(BaseTransport):
 
         self.loop = loop
 
+        self.log.info("Attaching writer for setup.")
         loop.add_writer(self.dev.fd, self.setup)
 
     def setup(self):
@@ -21,13 +22,17 @@ class AsyncioTransport(BaseTransport):
         - Send a status packet to the rfxtrx (No earlier than 0.05 seconds
           after the reset packet and no later than 10 seconds after)
         """
+        self.log.info("Removing writer.")
         self.loop.remove_writer(self.dev.fd)
 
+        self.log.info("Flushing and resetting the RFXtrx.")
         self.dev.flushInput()
         self.write(RESET_PACKET)
 
+        self.log.info("Adding reader to prepare to recieve.")
         self.loop.add_reader(self.dev.fd, self.read)
 
+        self.log.info("Writing reset packet in 0.1 seconds.")
         self.loop.call_later(0.1, self.write, STATUS_PACKET)
 
     def do_callback(self, pkt):

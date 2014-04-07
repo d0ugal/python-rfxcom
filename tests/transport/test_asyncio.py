@@ -1,5 +1,5 @@
 from unittest import TestCase
 
 
-class AsyncioTestCase(TestCase):
+class AsyncioTransportTestCase(TestCase):
     pass
