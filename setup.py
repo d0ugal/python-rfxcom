@@ -40,6 +40,8 @@ setup(
         'asyncio==0.4.1',
         'pyserial==2.7'
     ],
+    include_package_data=True,
+    platforms='any',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',

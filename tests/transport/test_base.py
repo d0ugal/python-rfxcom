@@ -1,16 +1,18 @@
 from unittest import TestCase
 from unittest.mock import Mock, ANY
 
+from serial import Serial
+
 from rfxcom.exceptions import PacketHandlerNotFound, RFXComException
 from rfxcom.protocol import Elec
 from rfxcom.transport.base import BaseTransport
 
 
-def _dummy_callback(*args, **kwargs):
+def _callback(*args, **kwargs):
     pass
 
 
-def _dummy_callback2(*args, **kwargs):
+def _callback2(*args, **kwargs):
     pass
 
 
@@ -18,7 +20,12 @@ class BaseTestCase(TestCase):
 
     def setUp(self):
 
-        self.transport = BaseTransport(device=None, callback=_dummy_callback)
+        self.elec_packet = (b'\x11\x5A\x01\x00\x2E\xB2\x03\x00\x00'
+                            b'\x02\xB4\x00\x00\x0C\x46\xA8\x11\x69')
+
+        self.device = Mock(spec=Serial)
+
+        self.transport = BaseTransport(device=self.device, callback=_callback)
         self.bytes_array = bytearray(b'\x11\x5A\x01\x00\x2E\xB2\x03\x00\x00')
 
     def test_format_packet(self):
@@ -31,51 +38,50 @@ class BaseTestCase(TestCase):
 
     def test_setup_callbacks_single(self):
 
-        self.assertEquals(self.transport.default_callback, _dummy_callback)
+        self.assertEquals(self.transport.default_callback, _callback)
 
         self.assertEquals(
             self.transport.get_callback_parser(self.bytes_array),
-            (_dummy_callback, ANY)
+            (_callback, ANY)
         )
 
     def test_setup_callbacks_mutli(self):
 
         # Setup - handler for Elec and fallback for the rest.
-        parser = BaseTransport(device=None, callbacks={
-            Elec: _dummy_callback2,
-            '*': _dummy_callback,
+        parser = BaseTransport(device=self.device, callbacks={
+            Elec: _callback2,
+            '*': _callback,
 
         })
 
         # Verify default fallback and callbacks dict contains Elec only.
-        self.assertEquals(parser.default_callback, _dummy_callback)
+        self.assertEquals(parser.default_callback, _callback)
         self.assertEquals(parser.callbacks, {
-            Elec: _dummy_callback2
+            Elec: _callback2
         })
 
     def test_get_callback_parser(self):
 
         # Setup - handler for Elec and fallback for the rest.
-        parser = BaseTransport(device=None, callbacks={
-            Elec: _dummy_callback2,
-            '*': _dummy_callback,
+        parser = BaseTransport(device=self.device, callbacks={
+            Elec: _callback2,
+            '*': _callback,
 
         })
 
         # create a valid elec packet to call with.
-        elec_packet = bytearray(b'\x11\x5A\x01\x00\x2E\xB2\x03\x00\x00'
-                                b'\x02\xB4\x00\x00\x0C\x46\xA8\x11\x69')
+        elec_packet = bytearray(self.elec_packet)
 
         self.assertEquals(
             parser.get_callback_parser(elec_packet),
-            (_dummy_callback2, ANY)
+            (_callback2, ANY)
         )
 
     def test_no_packet_handler_found(self):
 
         # Setup - handler for Elec and fallback for the rest.
-        parser = BaseTransport(device=None, callbacks={
-            Elec: _dummy_callback2,
+        parser = BaseTransport(device=self.device, callbacks={
+            Elec: _callback2,
         })
 
         with self.assertRaises(PacketHandlerNotFound):
@@ -84,22 +90,21 @@ class BaseTestCase(TestCase):
     def test_no_callbacks(self):
 
         with self.assertRaises(RFXComException):
-            BaseTransport(device=None)
+            BaseTransport(device=self.device)
 
     def test_do_callback(self):
 
         callback_mock = Mock()
 
         # Setup - handler for Elec and fallback for the rest.
-        parser = BaseTransport(device=None, callbacks={
+        parser = BaseTransport(device=self.device, callbacks={
             Elec: callback_mock,
-            '*': _dummy_callback,
+            '*': _callback,
 
         })
 
         # create a valid elec packet to call with.
-        elec_packet = bytearray(b'\x11\x5A\x01\x00\x2E\xB2\x03\x00\x00'
-                                b'\x02\xB4\x00\x00\x0C\x46\xA8\x11\x69')
+        elec_packet = bytearray(self.elec_packet)
 
         parser.do_callback(elec_packet)
 
@@ -110,3 +115,21 @@ class BaseTestCase(TestCase):
         self.transport.log.debug("test")
         self.assertEquals(self.transport.log.name,
                           'rfxcom.transport.BaseTransport')
+
+    def test_write(self):
+
+        self.transport.write(self.elec_packet)
+
+        self.device.write.assert_called_once_with(bytearray(self.elec_packet))
+
+    def test_reader(self):
+
+        self.device.read.return_value = self.elec_packet
+
+        self.transport.read()
+
+    def test_read_blank(self):
+
+        self.device.read.return_value = b'\x00'
+
+        self.transport.read()

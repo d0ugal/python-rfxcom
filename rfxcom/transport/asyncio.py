@@ -1,5 +1,3 @@
-from serial import Serial
-
 from rfxcom.transport.base import BaseTransport
 from rfxcom.protocol import RESET_PACKET, STATUS_PACKET
 
@@ -11,12 +9,7 @@ class AsyncioTransport(BaseTransport):
 
         super().__init__(device, callback=callback, callbacks=callbacks)
 
-        if SerialClass is None:
-            SerialClass = Serial
-
         self.loop = loop
-
-        self.dev = SerialClass(device, 38400, timeout=1)
 
         loop.add_writer(self.dev.fd, self.setup)
 
@@ -33,33 +26,9 @@ class AsyncioTransport(BaseTransport):
         self.dev.flushInput()
         self.write(RESET_PACKET)
 
-        self.loop.add_reader(self.dev.fd, self.reader)
+        self.loop.add_reader(self.dev.fd, self.read)
 
-        self.loop.call_later(0.5, self.write, STATUS_PACKET)
-
-    def write(self, data):
-
-        assert type(data) == bytes
-
-        pkt = bytearray(data)
-        self.log.info("WRITE: %s" % self.format_packet(pkt))
-        self.dev.write(pkt)
-
-    def reader(self):
-
-        data = self.dev.read()
-
-        while True:
-            if len(data) > 0:
-                if data == b'\x00':
-                    return
-                pkt = bytearray(data)
-                data = self.dev.read(pkt[0])
-                pkt.extend(bytearray(data))
-                break
-
-        self.log.info("READ : %s" % self.format_packet(pkt))
-        self.do_callback(pkt)
+        self.loop.call_later(0.1, self.write, STATUS_PACKET)
 
     def do_callback(self, pkt):
         callback, parser = self.get_callback_parser(pkt)

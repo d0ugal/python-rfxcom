@@ -1,15 +1,25 @@
 from logging import getLogger
 
+from serial import Serial
+
 from rfxcom.exceptions import PacketHandlerNotFound, RFXComException
 from rfxcom.protocol import HANDLERS
 
 
 class BaseTransport:
 
-    def __init__(self, device, callback=None, callbacks=None):
+    def __init__(self, device, callback=None, callbacks=None,
+                 SerialClass=None):
 
         self.log = getLogger('rfxcom.transport.%s' % self.__class__.__name__)
-        self.device = device
+
+        if SerialClass is None:
+            SerialClass = Serial
+
+        if isinstance(device, str):
+            self.dev = SerialClass(device, 38400, timeout=1)
+        else:
+            self.dev = device
 
         self._setup_callbacks(callback, callbacks)
 
@@ -50,6 +60,30 @@ class BaseTransport:
                 break
 
         return self.default_callback, parser
+
+    def write(self, data):
+
+        assert type(data) == bytes
+
+        pkt = bytearray(data)
+        self.log.info("WRITE: %s" % self.format_packet(pkt))
+        self.dev.write(pkt)
+
+    def read(self):
+
+        data = self.dev.read()
+
+        while True:
+            if len(data) > 0:
+                if data == b'\x00':
+                    return
+                pkt = bytearray(data)
+                data = self.dev.read(pkt[0])
+                pkt.extend(bytearray(data))
+                break
+
+        self.log.info("READ : %s" % self.format_packet(pkt))
+        self.do_callback(pkt)
 
     def do_callback(self, pkt):
 
