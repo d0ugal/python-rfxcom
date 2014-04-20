@@ -40,7 +40,7 @@ setup(
     version=find_version("rfxcom", "__init__.py"),
     url='https://github.com/d0ugal/rfxcom',
     license='BSD',
-    description="",
+    description="RFXCOM RFXtrx Library for Python 3.3+",
     long_description=read('README.rst'),
     author='Dougal Matthews',
     author_email='dougal@dougalmatthews.com',
