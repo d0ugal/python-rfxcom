@@ -3,9 +3,9 @@ from rfxcom.protocol.base import BasePacketHandler
 
 class Elec(BasePacketHandler):
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
 
-        super().__init__()
+        super().__init__(*args, **kwargs)
 
         self.PACKET_TYPES = {
             0x5A: "Energy usage sensors"
