@@ -38,3 +38,23 @@ class AsyncioTransport(BaseTransport):
     def do_callback(self, pkt):
         callback, parser = self.get_callback_parser(pkt)
         self.loop.call_soon(callback, parser)
+
+    def read(self):
+
+        self.log.debug("READ : STARTING")
+        data = self.dev.read()
+
+        if len(data) == 0:
+            self.log.debug("READ : Nothing received")
+            return
+
+        if data == b'\x00':
+            self.log.debug("READ : Empty packet (Got \x00)")
+            return
+
+        pkt = bytearray(data)
+        data = self.dev.read(pkt[0])
+        pkt.extend(bytearray(data))
+
+        self.log.info("READ : %s" % self.format_packet(pkt))
+        self.do_callback(pkt)

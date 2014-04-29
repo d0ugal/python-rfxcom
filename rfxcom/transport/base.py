@@ -71,16 +71,23 @@ class BaseTransport:
 
     def read(self):
 
+        self.log.debug("READ : STARTING")
         data = self.dev.read()
 
         while True:
-            if len(data) > 0:
-                if data == b'\x00':
-                    return
-                pkt = bytearray(data)
-                data = self.dev.read(pkt[0])
-                pkt.extend(bytearray(data))
-                break
+
+            if len(data) == 0:
+                self.log.debug("READ : Nothing received")
+                continue
+
+            if data == b'\x00':
+                self.log.debug("READ : Empty packet (Got \x00)")
+                return
+
+            pkt = bytearray(data)
+            data = self.dev.read(pkt[0])
+            pkt.extend(bytearray(data))
+            break
 
         self.log.info("READ : %s" % self.format_packet(pkt))
         self.do_callback(pkt)
