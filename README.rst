@@ -1,9 +1,9 @@
 RFXCOM
 ======
 
-.. image:: https://secure.travis-ci.org/d0ugal/rfxcom.png
+.. image:: https://secure.travis-ci.org/d0ugal/python-rfxcom.png
    :alt: Build Status
-   :target: https://travis-ci.org/d0ugal/rfxcom
+   :target: https://travis-ci.org/d0ugal/python-rfxcom
 
 A Python 3 library for working with your RFXTrx and automating your home.
 
