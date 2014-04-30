@@ -128,6 +128,12 @@ class BaseTransportTestCase(TestCase):
 
         self.transport.read()
 
+    def test_reader_empty(self):
+
+        self.device.read.return_value = ''
+
+        self.transport.read()
+
     def test_read_blank(self):
 
         self.device.read.return_value = b'\x00'

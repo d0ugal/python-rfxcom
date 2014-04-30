@@ -78,7 +78,7 @@ class BaseTransport:
 
             if len(data) == 0:
                 self.log.debug("READ : Nothing received")
-                continue
+                return
 
             if data == b'\x00':
                 self.log.debug("READ : Empty packet (Got \x00)")
