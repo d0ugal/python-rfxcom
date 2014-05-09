@@ -44,7 +44,7 @@ setup(
     long_description=read('README.rst'),
     author='Dougal Matthews',
     author_email='dougal@dougalmatthews.com',
-    packages=find_packages(exclude=["tests"]),
+    packages=find_packages(exclude=["tests*"]),
     install_requires=install_requires,
     include_package_data=True,
     platforms='any',
