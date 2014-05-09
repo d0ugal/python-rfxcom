@@ -21,25 +21,44 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'stream': stdout,
             'formatter': 'standard'
-        }
+        },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'standard',
+            'filename': '/tmp/rfxcom.log',
+            'maxBytes': 10 * 1024 * 1024,
+        },
     },
     'loggers': {
         'rfxcom': {
-            'handlers': ['console', ],
+            'handlers': ['console', 'file', ],
             'propagate': True,
             'level': 'DEBUG',
         }
     },
 }
 
-def noop(*args, **kwargs):
-    pass
 
-def handler(packet):
+def status_handler(packet):
+    return
+
+
+def elec_handler(packet):
     print(packet)
 
+
+def temp_humidity_handler(packet):
+    return
+
+
+def default_callback(packet):
+    print("???? :", packet)
+
+
 def write(rfxcom):
-    rfxcom.write(b'\x0D\x00\x00\x01\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00')
+    return
+
 
 def main():
 
@@ -53,10 +72,10 @@ def main():
 
     try:
         rfxcom = AsyncioTransport(args.device, loop, callbacks={
-            protocol.Status: noop,
-            protocol.Elec: noop,
-            protocol.TempHumidity: noop,
-            '*': handler,
+            protocol.Status: status_handler,
+            protocol.Elec: elec_handler,
+            protocol.TempHumidity: temp_humidity_handler,
+            '*': default_callback,
         })
         loop.call_later(2, partial(write, rfxcom))
         loop.run_forever()
