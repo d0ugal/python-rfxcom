@@ -1,4 +1,47 @@
+"""
+Energy Usage Sensors
+====================
+
+The Elec protocol supports energy usage sensors that transmit the Elec2 or
+Elec3 packet format. For example, the Owl energy sensor.
+
+====    ====
+Byte    Meaning
+====    ====
+0       Packet Length, 0x11 (excludes this byte)
+1       Packet Type, 0x5A
+2       Sub Type
+3       Sequence Number
+4       ID 1
+5       ID 2
+6       Count (?)
+7       Current Watts 1
+8       Current Watts 2
+9       Current Watts 3
+10      Current Watts 4
+11      Total Watts 1
+12      Total Watts 2
+13      Total Watts 3
+14      Total Watts 4
+15      Total Watts 5
+16      Total Watts 6
+17      Battery Level and RSSI
+====    ====
+
+"""
+
 from rfxcom.protocol.base import BasePacketHandler
+
+#: The Packet Types supported by this protocol.
+PACKET_TYPES = {
+    0x5A: "Energy usage sensors"
+}
+
+#: The Packet Sub Types for energy Sensors
+SUB_TYPES = {
+    0x01: "CM119/160",
+    0x02: "CM180",
+}
 
 
 class Elec(BasePacketHandler):
@@ -7,30 +50,42 @@ class Elec(BasePacketHandler):
 
         super().__init__(*args, **kwargs)
 
-        self.PACKET_TYPES = {
-            0x5A: "Energy usage sensors"
-        }
+        self.PACKET_TYPES = PACKET_TYPES
+        self.SUB_TYPES = SUB_TYPES
 
-        self.SUB_TYPES = {
-            0x01: "CM119/160",
-            0x02: "CM180",
-        }
-
-    def bytes_to_uint_32(self, bytes_):
+    def _bytes_to_uint_32(self, bytes_):
         """Converts an array of 4 bytes to a 32bit integer.
+
+        :param data: bytearray to be converted to a 32bit integer
+        :type data: bytearray
+
+        :return: the integer
+        :rtype: int
         """
         return ((bytes_[0] * pow(2, 24)) +
                 (bytes_[1] << 16) + (bytes_[2] << 8) + bytes_[3])
 
-    def bytes_to_uint_48(self, bytes_):
+    def _bytes_to_uint_48(self, bytes_):
         """Converts an array of 6 bytes to a 48bit integer.
+
+        :param data: bytearray to be converted to a 48bit integer
+        :type data: bytearray
+
+        :return: the integer
+        :rtype: int
         """
         return ((bytes_[0] * pow(2, 40)) + (bytes_[1] * pow(2, 32)) +
                 (bytes_[2] * pow(2, 24)) + (bytes_[3] << 16) +
                 (bytes_[4] << 8) + bytes_[4])
 
     def parse(self, data):
-        """Parse a 18 byte packet in the Elec format.
+        """Parse a 18 byte packet in the Elec2-3 format.
+
+        :param data: bytearray to be parsed
+        :type data: bytearray
+
+        :return: Data dictionary containing the parsed values
+        :rtype: dict
         """
 
         self.validate_packet(data)
@@ -45,21 +100,17 @@ class Elec(BasePacketHandler):
         count = data[6]
         instant = data[7:11]
         total = data[11:16]
-        battery_level = data[16]
-        rssi = data[17]
 
-        current_watts = self.bytes_to_uint_32(instant)
-        total_watts = self.bytes_to_uint_48(total) / TOTAL_DIVISOR
+        current_watts = self._bytes_to_uint_32(instant)
+        total_watts = self._bytes_to_uint_48(total) / TOTAL_DIVISOR
 
         return {
-            'battery_level': battery_level,
             'count': count,
             'current_watts': current_watts,
             'id': id_,
             'packet_length': packet_length,
             'packet_type': packet_type,
             'sequence_number': sequence_number,
-            'signal_strength': rssi,
             'sub_type': sub_type,
             'sub_type_name': self.SUB_TYPES.get(sub_type),
             'total_watts': total_watts,

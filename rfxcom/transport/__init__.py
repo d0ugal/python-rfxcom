@@ -1,4 +1,7 @@
-from .asyncio import AsyncioTransport
+"""
+rfxcom.transport.__init__
+=========================
 
+"""
 
-__all__ = ['AsyncioTransport', ]
+from .asyncio import AsyncioTransport  # NOQA

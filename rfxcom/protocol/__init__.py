@@ -1,3 +1,9 @@
+"""
+Protocol Constants
+==================
+
+"""
+
 from .base import Packet
 from .elec import Elec
 from .status import Status

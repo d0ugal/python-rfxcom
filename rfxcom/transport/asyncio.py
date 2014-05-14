@@ -1,3 +1,9 @@
+"""
+rfxcom.transport.asyncio
+========================
+
+"""
+
 from rfxcom.transport.base import BaseTransport
 from rfxcom.protocol import RESET_PACKET, STATUS_PACKET, MODE_PACKET
 

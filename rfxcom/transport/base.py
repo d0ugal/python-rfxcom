@@ -1,3 +1,9 @@
+"""
+rfxcom.transport.base
+=====================
+
+"""
+
 from logging import getLogger
 
 from serial import Serial
