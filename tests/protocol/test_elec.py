@@ -21,14 +21,12 @@ class Elec2TestCase(TestCase):
         result = self.parser.load(self.data)
 
         self.assertEquals(result, {
-            'battery_level': 17,
             'count': 3,
             'current_watts': 692,
             'id': "0x2EB2",
             'packet_length': 17,
             'packet_type': 90,
             'sequence_number': 0,
-            'signal_strength': 105,
             'sub_type': 1,
             'sub_type_name': "CM119/160",
             'total_watts': 920825.1947099693,
@@ -63,13 +61,13 @@ class Elec2TestCase(TestCase):
 
         data = self.data[7:11]
 
-        self.assertEqual(self.parser.bytes_to_uint_32(data), 692)
+        self.assertEqual(self.parser._bytes_to_uint_32(data), 692)
 
     def test_bytes_to_uint_48(self):
 
         data = self.data[11:16]
 
-        self.assertEquals(self.parser.bytes_to_uint_48(data), 205957288)
+        self.assertEquals(self.parser._bytes_to_uint_48(data), 205957288)
 
     def test_log_namer(self):
 

@@ -1,11 +1,81 @@
+"""
+Interface Message
+=================
+
+The Status packet
+-----------------
+
+These packets are returned from the RFXtrx itself and are used to show its
+status.
+
+====    ====
+Byte    Meaning
+====    ====
+0       Packet Length, 0x0A (excludes this byte)
+1       Packet Type, 0x14
+2       Sub Type
+3       Sequence Number
+4       Command
+5       Transceiver Type
+6       Firmware Version
+7       Flags for the enabled devides defined in _MSG3_PROTOCOLS
+8       Flags for the enabled devides defined in _MSG4_PROTOCOLS
+9       Flags for the enabled devides defined in _MSG5_PROTOCOLS
+10      Message 6
+11      Message 7
+12      Message 8
+13      Message 9
+====    ====
+
+"""
+
 from rfxcom.protocol.base import BasePacketHandler
 
 
 def int_to_binary_list(int_):
+    """A helper function that given an integer will return the eight byte
+    binary representation as a list.
+
+    :param data: Integer to be converted
+    :type data: int
+
+    :return: A list of single character strings of 1's and 0's
+    :rtype: list
+    """
     return list('{0:08b}'.format(int_))
 
-MSG3_PROTOCOLS = [
-    'EDisplay ofundecoded',
+
+#: The Packet Types supported by this protocol.
+PACKET_TYPES = {
+    0x01: "Interface message"
+}
+
+#: The Packet Sub Types for status packets
+SUB_TYPES = {
+    0x00: "Response on a mode command",
+    0xFF: "Wrong command recieved from the application.",
+}
+
+#: The list of reciever values and what they correspond to.
+_MSG1_RECEIVER_TYPE = {
+    0x50: '310MHz',
+    0x51: '315MHz',
+    0x52: '433.92MHz receiver only',
+    0x53: '433.92MHz transceiver',
+    0x55: '868.00MHz',
+    0x56: '868.00MHz FSK',
+    0x57: '868.30MHz',
+    0x58: '868.30MHz FSK',
+    0x59: '868.35MHz',
+    0x5A: '868.35MHz FSK',
+    0x5B: '868.95MHz',
+}
+
+#: Three lists defining the different supported devices. The names as msg3-5
+#: as messages 3 to 6 out of a larger list of messages in the packet define the
+#: protocols. Each one then maps to a binary flag in a series of three bytes.
+_MSG3_PROTOCOLS = [
+    'Display undecoded',
     'RFU6',
     'Byron SX',
     'RSL',
@@ -15,7 +85,7 @@ MSG3_PROTOCOLS = [
     'AE Blyss',
 ]
 
-MSG4_PROTOCOLS = [
+_MSG4_PROTOCOLS = [
     'BlindsT1/T2/T3/T4',
     'BlindsT0',
     'ProGuard',
@@ -26,7 +96,7 @@ MSG4_PROTOCOLS = [
     'Mertik',
 ]
 
-MSG5_PROTOCOLS = [
+_MSG5_PROTOCOLS = [
     'Visonic',
     'ATI',
     'Oregon Scientific',
@@ -37,7 +107,8 @@ MSG5_PROTOCOLS = [
     'X10',
 ]
 
-PROTOCOLS = MSG3_PROTOCOLS + MSG4_PROTOCOLS + MSG5_PROTOCOLS
+#: A list of protocols that can be enabled and disabled in the RFXtrx
+PROTOCOLS = _MSG3_PROTOCOLS + _MSG4_PROTOCOLS + _MSG5_PROTOCOLS
 
 
 class Status(BasePacketHandler):
@@ -46,16 +117,26 @@ class Status(BasePacketHandler):
 
         super().__init__(*args, **kwargs)
 
-        self.PACKET_TYPES = {
-            0x01: "Interface message"
-        }
-
-        self.SUB_TYPES = {
-            0x00: "Response on a mode command",
-            0xFF: "Wrong command recieved from the application.",
-        }
+        self.PACKET_TYPES = PACKET_TYPES
+        self.SUB_TYPES = SUB_TYPES
 
     def log_enabled_protocols(self, flags, protocols):
+        """Given a list of single character strings of 1's and 0's and a list
+        of protocol names. Log the status of each protocol where ``"1"`` is
+        enabled and ``"0"`` is disabled. The order of the lists here is
+        important as they need to be zipped together to create the mapping.
+        Then return a tuple of two lists containing the names of the enabled
+        and disabled protocols.
+
+        :param character: A list of single character strings of 1's and 0's
+        :type character: list
+
+        :param protocols: A list of protocol names.
+        :type protocols: list
+
+        :return: Tuple containing two lists which contain n strings.
+        :rtype: tuple
+        """
 
         enabled, disabled = [], []
 
@@ -74,7 +155,13 @@ class Status(BasePacketHandler):
         return enabled, disabled
 
     def parse(self, data):
-        """Parse a 18 byte packet in the Status format.
+        """Parse a 13 byte packet in the Status format.
+
+        :param data: bytearray to be parsed
+        :type data: bytearray
+
+        :return: Data dictionary containing the parsed values
+        :rtype: dict
         """
 
         self.validate_packet(data)
@@ -85,6 +172,7 @@ class Status(BasePacketHandler):
         sequence_number = data[3]
         command_type = data[4]
         transceiver_type = data[5]
+        transceiver_type_text = _MSG1_RECEIVER_TYPE.get(data[5])
         firmware_version = data[6]
 
         flags = int_to_binary_list(data[7])
@@ -101,6 +189,7 @@ class Status(BasePacketHandler):
             'sub_type_name': self.SUB_TYPES.get(sub_type),
             'command_type': command_type,
             'transceiver_type': transceiver_type,
+            'transceiver_type_text': transceiver_type_text,
             'firmware_version': firmware_version,
             'enabled_protocols': enabled,
             'disabled_protocols': disabled,

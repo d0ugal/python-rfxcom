@@ -1,3 +1,12 @@
+"""
+Base Protocol
+=============
+
+The base package used to define the domain models for Packets and and Packet
+Handlers.
+
+"""
+
 from datetime import datetime
 from logging import getLogger
 
@@ -6,25 +15,42 @@ from rfxcom.exceptions import (InvalidPacketLength, UnknownPacketType,
 
 
 class BasePacket:
-    """
-    The base class for all packet handling classes. Provides a number of simple
-    helper methods and outlines the API.
+    """The BasePacket class defines a packet that can be sent or received by
+    the rfxtrx. It provides a number of simple helper methods and outlines the
+    base API.
     """
 
     def __init__(self):
+        """The BasePacket class is initialised with no arguments. It simply
+        sets up a number of instance attributes when its created.
+        """
 
         self.log = getLogger('rfxcom.protocol.%s' % self.__class__.__name__)
         self.PACKET_TYPES = {}
         self.SUB_TYPES = {}
 
     def dump_hex(self, data):
-        """Given some bytes return the hex representation."""
+        """Given some bytes return the hex representation.
+
+        :param data: bytearray to be formatted as a string
+        :type data: bytearray
+
+        :return: The formatted bytes as a readable hex string.
+        :rtype: string
+        """
         return "0x%s" % (''.join('{:02x}'.format(x) for x in data)).upper()
 
     def parse(self, data):
         """Stub method to be implemented by subclasses. The parse method
         should accept a bytearray, parse it and return a dictionary containing
         the parsed values.
+
+        :param data: bytearray to be parsed
+        :type data: bytearray
+
+        :raises: :py:class:`NotImplementedError`: if this method isn't
+            implemented by the subclass
+
         """
         raise NotImplementedError()
 
@@ -47,17 +73,53 @@ class BasePacket:
 class BasePacketHandler(BasePacket):
 
     def can_handle(self, data):
+        """Determine if the packet handler understand and can parse this
+        packet. This is defined by the checks in the ``validate_packet``
+        method but can_handle provides a neat interface to ignore errors and
+        see if the packet is good.
+
+        :param data: bytearray to be verified
+        :type data: bytearray
+
+        :return: The formatted bytes as a readable hex string.
+        :rtype: boolean
+        """
 
         try:
             return self.validate_packet(data)
         except RFXComException:
             return False
 
-    def validate_packet(self, data):
-        """Validate a packet.
+        return True
 
-        Validate against the following checks, raising exceptions if they fail
-        and return True when they all pass.
+    def validate_packet(self, data):
+        """Validate a packet against this packet handler and determine if it
+        meets the requirements. This is done by checking the following
+        conditions are true.
+
+        - The length of the packet is equal to the first byte.
+        - The second byte is in the set of defined PACKET_TYPES for this class.
+        - The third byte is in the set of defined SUB_TYPES for this class.
+
+        If one or more of these conditions isn't met then we have a packet that
+        isn't valid or at least isn't understood by this handler.
+
+        :param data: bytearray to be verified
+        :type data: bytearray
+
+
+        :raises: :py:class:`rfxcom.exceptions.InvalidPacketLength`: If the
+            number of bytes in the packet doesn't match the expected length.
+
+        :raises: :py:class:`rfxcom.exceptions.UnknownPacketType`: If the packet
+            type is unknown to this packet handler
+
+        :raises: :py:class:`rfxcom.exceptions.UnknownPacketSubtype`: If the
+            packet sub type is unknown to this packet handler
+
+        :return: true is returned if validation passes.
+        :rtype: boolean
+
         """
 
         # Validate length.
@@ -98,6 +160,11 @@ class BasePacketHandler(BasePacket):
 
 
 class Packet(BasePacket):
+    """The Packet class is a base class that can be used for all data packets.
+    It is a dumb class that accepts any data and doesn't validate it. However,
+    it means that unrecognised packets can be handled in a similar way to those
+    that are seen to be from a particular type of device.
+    """
 
     def can_handle(self, data):
         return True

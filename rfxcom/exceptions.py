@@ -1,6 +1,15 @@
+"""
+rfxcom.exceptions
+=================
+
+This module defines all of the custom exceptions that can be raised by rfxcom.
+"""
+
 
 class RFXComException(Exception):
-    pass
+    """This based exception class should never be raised, but can be used when
+    you want to catch all exceptions raised by rfxcom.
+    """
 
 
 class PacketHandlerNotFound(RFXComException):

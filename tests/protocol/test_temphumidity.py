@@ -25,7 +25,7 @@ class TempHumidityTestCase(TestCase):
             'packet_type': 82,
             'sequence_number': 17,
             'sub_type': 2,
-            'sub_type_name': '',
+            'sub_type_name': 'THGR810, THGN800, THGR810',
             'temperature': 16.7,
             'id': '0x7002',
             'signal_strength': 137,

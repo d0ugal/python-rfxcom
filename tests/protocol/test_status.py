@@ -20,6 +20,36 @@ class StatusTestCase(TestCase):
         self.assertTrue(self.parser.can_handle(self.data))
         result = self.parser.load(self.data)
 
+        self.assertEquals(result.pop('disabled_protocols'), [
+            'AD LightwaveRF',
+            'AE Blyss',
+            'ATI',
+            'BlindsT0',
+            'BlindsT1/T2/T3/T4',
+            'Byron SX',
+            'Display undecoded',
+            'FS20',
+            'FineOffset/Viking',
+            'Lighting4',
+            'Meiantech',
+            'Mertik',
+            'ProGuard',
+            'RFU6',
+            'RSL',
+            'Rubicson',
+            'Visonic',
+        ])
+
+        self.assertEquals(result.pop('enabled_protocols'), [
+            'AC',
+            'ARC',
+            'Hideki/UPM',
+            'HomeEasy EU',
+            'La Crosse',
+            'Oregon Scientific',
+            'X10',
+        ])
+
         self.assertEquals(result, {
             'packet_length': 13,
             'packet_type': 1,
@@ -27,36 +57,9 @@ class StatusTestCase(TestCase):
             'sub_type': 0,
             'sub_type_name': 'Response on a mode command',
             'transceiver_type': 83,
+            'transceiver_type_text': '433.92MHz transceiver',
             'firmware_version': 69,
             'command_type': 2,
-            'disabled_protocols': [
-                'AD LightwaveRF',
-                'AE Blyss',
-                'ATI',
-                'BlindsT0',
-                'BlindsT1/T2/T3/T4',
-                'Byron SX',
-                'EDisplay ofundecoded',
-                'FS20',
-                'FineOffset/Viking',
-                'Lighting4',
-                'Meiantech',
-                'Mertik',
-                'ProGuard',
-                'RFU6',
-                'RSL',
-                'Rubicson',
-                'Visonic',
-            ],
-            'enabled_protocols': [
-                'AC',
-                'ARC',
-                'Hideki/UPM',
-                'HomeEasy EU',
-                'La Crosse',
-                'Oregon Scientific',
-                'X10',
-            ],
         })
 
     def test_validate_bytes_short(self):
