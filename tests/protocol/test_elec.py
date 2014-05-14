@@ -61,13 +61,13 @@ class Elec2TestCase(TestCase):
 
         data = self.data[7:11]
 
-        self.assertEqual(self.parser.bytes_to_uint_32(data), 692)
+        self.assertEqual(self.parser._bytes_to_uint_32(data), 692)
 
     def test_bytes_to_uint_48(self):
 
         data = self.data[11:16]
 
-        self.assertEquals(self.parser.bytes_to_uint_48(data), 205957288)
+        self.assertEquals(self.parser._bytes_to_uint_48(data), 205957288)
 
     def test_log_namer(self):
 

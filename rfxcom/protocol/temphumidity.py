@@ -42,6 +42,7 @@ SUB_TYPES = {
     0x0B: 'EW109',
 }
 
+
 class TempHumidity(BasePacketHandler):
 
     def __init__(self, *args, **kwargs):

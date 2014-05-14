@@ -57,6 +57,7 @@ class StatusTestCase(TestCase):
             'sub_type': 0,
             'sub_type_name': 'Response on a mode command',
             'transceiver_type': 83,
+            'transceiver_type_text': '433.92MHz transceiver',
             'firmware_version': 69,
             'command_type': 2,
         })
