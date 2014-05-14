@@ -90,8 +90,6 @@ class BasePacketHandler(BasePacket):
         except RFXComException:
             return False
 
-        return True
-
     def validate_packet(self, data):
         """Validate a packet against this packet handler and determine if it
         meets the requirements. This is done by checking the following
