@@ -7,5 +7,6 @@ rfxcom.protocol
  __init__
  base
  elec
+ lighting5
  status
  temphumidity

@@ -6,6 +6,7 @@ Protocol Constants
 
 from .base import Packet
 from .elec import Elec
+from .lighting5 import Lighting5
 from .status import Status
 from .temphumidity import TempHumidity
 
@@ -24,4 +25,10 @@ MODE_PACKET = b'\x0D\x00\x00\x01\x03\x53\x00\x00\x0E\x2F\x00\x00\x00\x00'
 
 #: A list containing all the packet types supported in python-rfxcom. The
 #: last one is a raw packet and will be used for any unrecognised devices.
-HANDLERS = [Elec, Status, TempHumidity, Packet]
+HANDLERS = [
+    Elec,
+    Lighting5,
+    Packet,
+    Status,
+    TempHumidity,
+]
