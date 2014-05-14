@@ -102,7 +102,7 @@ def gen_ref(ver, title, names):
 
 if not on_rtd:
     gen_ref("", "rfxcom", ["exceptions", ])
-    gen_ref("protocol", "rfxcom.protocol", ["base", "elec", "status",
+    gen_ref("protocol", "rfxcom.protocol", ["base", "elec", "lighting5", "status",
         "temphumidity" ])
     gen_ref("transport", "rfxcom.transport", ["asyncio", "base" ])
 
