@@ -27,13 +27,13 @@ def find_version(*parts):
     return finder.version
 
 install_requires = [
-    'pyserial==2.7'
+    'pyserial>=2.7'
 ]
 
 # We only want to install asyncio on Python 3.3 - it comes with 3.4 and wont
 # work on earlier versions.
 if sys.version_info[:2] == (3, 3):
-    install_requires.append('asyncio==0.4.1')
+    install_requires.append('asyncio>=0.4.1')
 
 setup(
     name="rfxcom",
