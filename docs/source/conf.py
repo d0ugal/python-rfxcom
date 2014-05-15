@@ -102,9 +102,9 @@ def gen_ref(ver, title, names):
 
 if not on_rtd:
     gen_ref("", "rfxcom", ["exceptions", ])
-    gen_ref("protocol", "rfxcom.protocol", ["base", "elec", "lighting5", "status",
-        "temphumidity" ])
-    gen_ref("transport", "rfxcom.transport", ["asyncio", "base" ])
+    gen_ref("protocol", "rfxcom.protocol", ["base", "elec", "lighting5",
+            "status", "temphumidity"])
+    gen_ref("transport", "rfxcom.transport", ["asyncio", "base"])
 
 
 # -- General configuration ------------------------------------------------
@@ -280,7 +280,7 @@ latex_elements = {}
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    ('index', 'rfxcom.tex', 'rfxcom Documentation', 'Dougal Matthews', 'manual'),
+    ('index', 'rfxcom.tex', 'rfxcom Docs', 'Dougal Matthews', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of

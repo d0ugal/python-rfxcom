@@ -29,6 +29,7 @@ class Lighting5TestCase(TestCase):
             'sub_type_name': "LightwaveRF, Siemens",
             'unit_code': 1,
             'command': 1,
+            'command_text': "On",
             'level': 0,
             'rssi': 96,
         })

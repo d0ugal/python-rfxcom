@@ -2,61 +2,11 @@
 Interface Message
 =================
 
-The Status packet
------------------
-
-These packets are returned from the RFXtrx itself and are used to show its
-status.
-
-====    ====
-Byte    Meaning
-====    ====
-0       Packet Length, 0x0A (excludes this byte)
-1       Packet Type, 0x14
-2       Sub Type
-3       Sequence Number
-4       Command
-5       Transceiver Type
-6       Firmware Version
-7       Flags for the enabled devides defined in _MSG3_PROTOCOLS
-8       Flags for the enabled devides defined in _MSG4_PROTOCOLS
-9       Flags for the enabled devides defined in _MSG5_PROTOCOLS
-10      Message 6
-11      Message 7
-12      Message 8
-13      Message 9
-====    ====
-
 """
 
 from rfxcom.protocol.base import BasePacketHandler
 
 
-def int_to_binary_list(int_):
-    """A helper function that given an integer will return the eight byte
-    binary representation as a list.
-
-    :param data: Integer to be converted
-    :type data: int
-
-    :return: A list of single character strings of 1's and 0's
-    :rtype: list
-    """
-    return list('{0:08b}'.format(int_))
-
-
-#: The Packet Types supported by this protocol.
-PACKET_TYPES = {
-    0x01: "Interface message"
-}
-
-#: The Packet Sub Types for status packets
-SUB_TYPES = {
-    0x00: "Response on a mode command",
-    0xFF: "Wrong command recieved from the application.",
-}
-
-#: The list of reciever values and what they correspond to.
 _MSG1_RECEIVER_TYPE = {
     0x50: '310MHz',
     0x51: '315MHz',
@@ -107,20 +57,45 @@ _MSG5_PROTOCOLS = [
     'X10',
 ]
 
-#: A list of protocols that can be enabled and disabled in the RFXtrx
 PROTOCOLS = _MSG3_PROTOCOLS + _MSG4_PROTOCOLS + _MSG5_PROTOCOLS
 
 
 class Status(BasePacketHandler):
+    """The Status packet is returned by the RFXtrx itself and is used to show
+    the status and configuration of the device.
 
+    ====    ====
+    Byte    Meaning
+    ====    ====
+    0       Packet Length, 0x0A (excludes this byte)
+    1       Packet Type, 0x14
+    2       Sub Type
+    3       Sequence Number
+    4       Command
+    5       Transceiver Type
+    6       Firmware Version
+    7       Flags for the enabled devides defined in _MSG3_PROTOCOLS
+    8       Flags for the enabled devides defined in _MSG4_PROTOCOLS
+    9       Flags for the enabled devides defined in _MSG5_PROTOCOLS
+    10      Message 6
+    11      Message 7
+    12      Message 8
+    13      Message 9
+    ====    ====
+    """
     def __init__(self, *args, **kwargs):
 
         super().__init__(*args, **kwargs)
 
-        self.PACKET_TYPES = PACKET_TYPES
-        self.SUB_TYPES = SUB_TYPES
+        self.PACKET_TYPES = {
+            0x01: "Interface message"
+        }
+        self.SUB_TYPES = {
+            0x00: "Response on a mode command",
+            0xFF: "Wrong command recieved from the application.",
+        }
 
-    def log_enabled_protocols(self, flags, protocols):
+    def _log_enabled_protocols(self, flags, protocols):
         """Given a list of single character strings of 1's and 0's and a list
         of protocol names. Log the status of each protocol where ``"1"`` is
         enabled and ``"0"`` is disabled. The order of the lists here is
@@ -154,6 +129,18 @@ class Status(BasePacketHandler):
 
         return enabled, disabled
 
+    def _int_to_binary_list(self, int_):
+        """A helper function that given an integer will return the eight byte
+        binary representation as a list.
+
+        :param data: Integer to be converted
+        :type data: int
+
+        :return: A list of single character strings of 1's and 0's
+        :rtype: list
+        """
+        return list('{0:08b}'.format(int_))
+
     def parse(self, data):
         """Parse a 13 byte packet in the Status format.
 
@@ -175,11 +162,11 @@ class Status(BasePacketHandler):
         transceiver_type_text = _MSG1_RECEIVER_TYPE.get(data[5])
         firmware_version = data[6]
 
-        flags = int_to_binary_list(data[7])
-        flags.extend(int_to_binary_list(data[8]))
-        flags.extend(int_to_binary_list(data[9]))
+        flags = self._int_to_binary_list(data[7])
+        flags.extend(self._int_to_binary_list(data[8]))
+        flags.extend(self._int_to_binary_list(data[9]))
 
-        enabled, disabled = self.log_enabled_protocols(flags, PROTOCOLS)
+        enabled, disabled = self._log_enabled_protocols(flags, PROTOCOLS)
 
         return {
             'packet_length': packet_length,
