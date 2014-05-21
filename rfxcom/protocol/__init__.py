@@ -28,7 +28,7 @@ MODE_PACKET = b'\x0D\x00\x00\x01\x03\x53\x00\x00\x0E\x2F\x00\x00\x00\x00'
 HANDLERS = [
     Elec,
     Lighting5,
-    Packet,
     Status,
     TempHumidity,
+    Packet,  # At the end as we should try it last.
 ]
