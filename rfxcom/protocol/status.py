@@ -92,7 +92,7 @@ class Status(BasePacketHandler):
         }
         self.SUB_TYPES = {
             0x00: "Response on a mode command",
-            0xFF: "Wrong command recieved from the application.",
+            0xFF: "Wrong command received from the application.",
         }
 
     def _log_enabled_protocols(self, flags, protocols):
