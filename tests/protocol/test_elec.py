@@ -26,11 +26,14 @@ class Elec2TestCase(TestCase):
             'id': "0x2EB2",
             'packet_length': 17,
             'packet_type': 90,
+            'packet_type_name': 'Energy usage sensors',
             'sequence_number': 0,
             'sub_type': 1,
             'sub_type_name': "CM119/160",
             'total_watts': 920825.1947099693,
         })
+
+        self.assertEquals(str(self.parser), "<Elec ID:0x2EB2>")
 
     def test_validate_bytes_short(self):
 

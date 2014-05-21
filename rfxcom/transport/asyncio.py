@@ -37,24 +37,24 @@ class AsyncioTransport(BaseTransport):
         self.log.info("Removing setup writer.")
         self.loop.remove_writer(self.dev.fd)
 
-        self.log.info("Flushing the RFXtrx.")
+        self.log.info("Adding reader to prepare to receive.")
+        self.loop.add_reader(self.dev.fd, self.read)
+
+        self.log.info("Flushing the RFXtrx buffer.")
         self.dev.flushInput()
 
         self.log.info("Writing the reset packet to the RFXtrx. (blocking)")
         super().write(RESET_PACKET)
 
-        self.log.info("Adding reader to prepare to receive.")
-        self.loop.add_reader(self.dev.fd, self.read)
+        self.log.info("Write the status packet in 0.1 seconds. (blocking)")
+        self.loop.call_later(0.1, super().write(STATUS_PACKET))
 
-        self.log.info("Adding status packet to the write queue.")
-        self.write(STATUS_PACKET)
+        self.log.info("Adding the queued writer in 0.2 seconds.")
+        self.loop.call_later(
+            0.2, self.loop.add_writer, self.dev.fd, self._writer)
 
         self.log.info("Adding mode packet to the write queue.")
         self.write(MODE_PACKET)
-
-        self.log.info("Adding the writer in 0.1 seconds.")
-        self.loop.call_later(
-            0.1, self.loop.add_writer, self.dev.fd, self._writer)
 
     def _writer(self):
         """We have been called to write! Take the oldest item off the queue
@@ -84,8 +84,6 @@ class AsyncioTransport(BaseTransport):
         the length of the packet and then pass to the callback.
         """
 
-        self.log.debug("Starting read.")
-
         data = self.dev.read()
 
         if len(data) == 0:
@@ -102,5 +100,3 @@ class AsyncioTransport(BaseTransport):
 
         self.log.info("READ : %s" % self.format_packet(pkt))
         self.do_callback(pkt)
-
-        self.log.debug("Finished read.")

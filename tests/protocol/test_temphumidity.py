@@ -23,6 +23,7 @@ class TempHumidityTestCase(TestCase):
         self.assertEquals(result, {
             'packet_length': 10,
             'packet_type': 82,
+            'packet_type_name': 'Temperature and humidity sensors',
             'sequence_number': 17,
             'sub_type': 2,
             'sub_type_name': 'THGR810, THGN800, THGR810',
@@ -33,6 +34,8 @@ class TempHumidityTestCase(TestCase):
             'humidity_status': 0,
             'battery_signal_level': 137,
         })
+
+        self.assertEquals(str(self.parser), "<TempHumidity ID:0x7002>")
 
     def test_negative_temp(self):
 

@@ -156,6 +156,10 @@ class BasePacketHandler(BasePacket):
 
         return True
 
+    def __str__(self):
+        return "<{0} ID:{1}>".format(
+            self.__class__.__name__, self.data.get('id'))
+
 
 class Packet(BasePacket):
     """The Packet class is a base class that can be used for all data packets.

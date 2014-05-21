@@ -53,6 +53,7 @@ class StatusTestCase(TestCase):
         self.assertEquals(result, {
             'packet_length': 13,
             'packet_type': 1,
+            'packet_type_name': 'Interface message',
             'sequence_number': 1,
             'sub_type': 0,
             'sub_type_name': 'Response on a mode command',
@@ -61,6 +62,8 @@ class StatusTestCase(TestCase):
             'firmware_version': 69,
             'command_type': 2,
         })
+
+        self.assertEquals(str(self.parser), "<Status ID:None>")
 
     def test_validate_bytes_short(self):
 

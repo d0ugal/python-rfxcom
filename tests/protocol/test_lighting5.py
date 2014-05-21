@@ -24,6 +24,7 @@ class Lighting5TestCase(TestCase):
             'id': "0xF394AB",
             'packet_length': 10,
             'packet_type': 20,
+            'packet_type_name': "Lighting5",
             'sequence_number': 173,
             'sub_type': 0,
             'sub_type_name': "LightwaveRF, Siemens",
@@ -33,6 +34,8 @@ class Lighting5TestCase(TestCase):
             'level': 0,
             'rssi': 96,
         })
+
+        self.assertEquals(str(self.parser), "<Lighting5 ID:0xF394AB>")
 
     def test_validate_bytes_short(self):
 

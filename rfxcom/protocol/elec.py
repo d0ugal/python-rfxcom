@@ -119,6 +119,7 @@ class Elec(BasePacketHandler):
             'id': id_,
             'packet_length': packet_length,
             'packet_type': packet_type,
+            'packet_type_name': self.PACKET_TYPES.get(packet_type),
             'sequence_number': sequence_number,
             'sub_type': sub_type,
             'sub_type_name': self.SUB_TYPES.get(sub_type),

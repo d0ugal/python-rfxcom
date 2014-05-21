@@ -36,13 +36,29 @@ class BaseTransport:
 
         if callback is None and callbacks is None:
             raise RFXComException(
-                "Either callback or callbacks must be provided.")
-        elif callbacks is None:
+                "Either callback (an individual function) or callbacks (a "
+                "dict mapping packet types to callbacks) must be provided.")
+
+        elif callback is not None:
             self.callbacks = {}
             self.default_callback = callback
-        elif callback is None:
+            self.log.info("Starting with individual callback: %s" %
+                          callback.__qualname__)
+
+        elif callbacks is not None:
+
             self.callbacks = callbacks
             self.default_callback = self.callbacks.pop('*', None)
+
+            for packet, callback in self.callbacks.items():
+                self.log.info("Callback %s added for packet %s" % (
+                              callback, packet))
+
+            if self.default_callback is not None:
+                self.log.info("Default callback: %s" %
+                              self.default_callback.__qualname__)
+            else:
+                self.log.warning("No default callback provided.")
 
     def get_callback_parser(self, pkt):
 
