@@ -42,8 +42,7 @@ class BaseTransport:
         elif callback is not None:
             self.callbacks = {}
             self.default_callback = callback
-            self.log.info("Starting with individual callback: %s" %
-                          callback.__qualname__)
+            self.log.info("Starting with individual callback: %s" % callback)
 
         elif callbacks is not None:
 
@@ -56,7 +55,7 @@ class BaseTransport:
 
             if self.default_callback is not None:
                 self.log.info("Default callback: %s" %
-                              self.default_callback.__qualname__)
+                              self.default_callback)
             else:
                 self.log.warning("No default callback provided.")
 
