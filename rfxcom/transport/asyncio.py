@@ -13,7 +13,8 @@ class AsyncioTransport(BaseTransport):
     def __init__(self, device, loop, callback=None, callbacks=None,
                  SerialClass=None):
 
-        super().__init__(device, callback=callback, callbacks=callbacks)
+        super().__init__(device, callback=callback, callbacks=callbacks,
+                         SerialClass=SerialClass)
 
         self.loop = loop
         self.write_queue = []
