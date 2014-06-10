@@ -1,7 +1,10 @@
 *.egg-info
 *.pyc
+*.swp
 .coverage
 .tox
 .vagrant
+.ropeproject
 dist
+tags
 docs/build/*
