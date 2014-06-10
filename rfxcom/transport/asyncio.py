@@ -48,7 +48,7 @@ class AsyncioTransport(BaseTransport):
         super().write(RESET_PACKET)
 
         self.log.info("Write the status packet in 0.1 seconds. (blocking)")
-        self.loop.call_later(0.1, super().write(STATUS_PACKET))
+        self.loop.call_later(0.1, super().write, STATUS_PACKET)
 
         self.log.info("Adding the queued writer in 0.2 seconds.")
         self.loop.call_later(
