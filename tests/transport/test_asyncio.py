@@ -1,10 +1,46 @@
+"""Unit tests for rfxcom.asyncio.AsyncioTransport."""
 from unittest import TestCase, mock
 
 from rfxcom.transport import AsyncioTransport
-from rfxcom.protocol import RESET_PACKET, MODE_PACKET, STATUS_PACKET
+
+# It's a unittest, let's be flexible
+# pylint: disable=C0111,W0212,R0201
+
+
+def execute_coroutine(coroutine):
+    """Execute a coroutine.
+
+    The coroutine is a generator which 'yields from' other iterables in the
+    form of asyncio.Future instances. For each generated value, wait for it to
+    be done and move on to the next one, until the generator has completed.
+
+    Since there is no loop instance to enter, it might be needed to mock each
+    yielded value before executing the coroutine, to avoid blocking situations.
+
+    Exemple:
+        with mock.patch('coro.yielded.metod.Function'):
+            result = execute_coroutine(coro)
+
+    Althogh this helper is thought to work with coroutined generators, it
+    should work with any iterator.
+
+    @param coroutine: an iterable, e.g. an asyncio.coroutine decorated method
+      yielding something.
+
+    @returns the return value of the coroutine, or None if nothing is returned
+    """
+    try:
+        future = next(coroutine)
+        while not future.done():
+            pass
+    except StopIteration as exc:
+        if hasattr(exc, 'value'):
+            return exc.value
 
 
 class AsyncioTransportTestCase(TestCase):
+
+    """AsyncioTransport test case."""
 
     @mock.patch('asyncio.AbstractEventLoop')
     @mock.patch('serial.Serial')
@@ -12,20 +48,46 @@ class AsyncioTransportTestCase(TestCase):
         unit = AsyncioTransport(device, loop, callback=mock.Mock())
         loop.add_writer.assert_called_once_with(device.fd, unit.setup)
 
+    @mock.patch('rfxcom.transport.asyncio.AsyncioTransport._setup')
+    @mock.patch('asyncio.async')
     @mock.patch('asyncio.AbstractEventLoop')
     @mock.patch('serial.Serial')
-    @mock.patch('rfxcom.transport.AsyncioTransport.write')
-    def test_transport_setup(self, unit_write, device, loop):
-
+    def test_transport_setup(self, device, loop, async, _setup):
         unit = AsyncioTransport(device, loop, callback=mock.Mock())
+        # reset mocks which have been 'called' by the constructor
+        device.reset_mock()
+        loop.reset_mock()
         unit.setup()
 
-        loop.remove_writer.assert_called_with(device.fd)
-        device.write.assert_called_once(RESET_PACKET)
-        loop.call_later.assert_any_call(mock.ANY,
-                                        super(AsyncioTransport, unit).write,
-                                        STATUS_PACKET)
-        unit_write.assert_called_once_with(MODE_PACKET)
+        loop.remove_writer.assert_called_once_with(device.fd)
+        async.assert_called_once_with(_setup())
+
+    @mock.patch('rfxcom.transport.asyncio.AsyncioTransport.sendRESET')
+    @mock.patch('rfxcom.transport.asyncio.AsyncioTransport.sendSTATUS')
+    @mock.patch('rfxcom.transport.asyncio.AsyncioTransport.sendMODE')
+    @mock.patch('asyncio.sleep')
+    @mock.patch('asyncio.AbstractEventLoop')
+    @mock.patch('serial.Serial')
+    def test_transport__setup(self, device, loop, sleep, mode, status, reset):
+        unit = AsyncioTransport(device, loop, callback=mock.Mock())
+        # reset mocks which have been 'called' by the constructor
+        device.reset_mock()
+        loop.reset_mock()
+
+        # run: exaust the coroutine generator
+        execute_coroutine(unit._setup())
+
+        loop.add_reader.assert_called_with(device.fd, unit.read)
+        reset.assert_called_once_with()
+        sleep.assert_has_calls((mock.ANY, mock.ANY))
+        slept_time = sleep.call_args[0][0]
+        # by spec it needs to be between 0.5ms and 9000ms
+        self.assertGreater(slept_time, 0.05)
+        self.assertLess(slept_time, 9)
+        mode.assert_called_once_with()
+        status.assert_called_once_with()
+        loop.call_soon.assert_called_once_with(loop.add_writer, device.fd,
+                                               unit._writer)
 
     @mock.patch('asyncio.AbstractEventLoop')
     @mock.patch('serial.Serial')

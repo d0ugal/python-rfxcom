@@ -4,12 +4,13 @@ rfxcom.transport.asyncio
 
 """
 
+import asyncio
+
 from rfxcom.transport.base import BaseTransport
 from rfxcom.protocol import RESET_PACKET, STATUS_PACKET, MODE_PACKET
 
 
 class AsyncioTransport(BaseTransport):
-
     def __init__(self, device, loop, callback=None, callbacks=None,
                  SerialClass=None):
 
@@ -23,7 +24,7 @@ class AsyncioTransport(BaseTransport):
         loop.add_writer(self.dev.fd, self.setup)
 
     def setup(self):
-        """Performs the RFXtrx initialisation protocol.
+        """Performs the RFXtrx initialisation protocol in a Future.
 
         Currently this is the rough workflow of the interactions with the
         RFXtrx. We also do a few extra things - flush the buffer, and attach
@@ -35,28 +36,54 @@ class AsyncioTransport(BaseTransport):
         4. Receive status response
         5. Write the MODE packet to enable or disabled the required protocols.
         """
-
         self.log.info("Removing setup writer.")
         self.loop.remove_writer(self.dev.fd)
 
+        asyncio.async(self._setup())
+
+    def _setup(self):
         self.log.info("Adding reader to prepare to receive.")
         self.loop.add_reader(self.dev.fd, self.read)
 
         self.log.info("Flushing the RFXtrx buffer.")
-        self.dev.flushInput()
+        self.flushSerialInput()
 
         self.log.info("Writing the reset packet to the RFXtrx. (blocking)")
+        yield from self.sendRESET()
+
+        self.log.info("Wating 0.1s")
+        yield from asyncio.sleep(0.1)
+
+        self.log.info("Write the status packet (blocking)")
+        yield from self.sendSTATUS()
+
+        # FIXME sleep as a temporary measure, as the MODE might be sent before
+        # STATUS has an answer
+        yield from asyncio.sleep(0.2)
+        # TODO receive status response, compare it with the needed MODE and
+        # request a new MODE if required. Currenly MODE is always sent.
+
+        self.log.info("Adding mode packet to the write queue (blocking)")
+        yield from self.sendMODE()
+
+        self.log.info("Adding the queued writer next loop iteration.")
+        self.loop.call_soon(self.loop.add_writer, self.dev.fd, self._writer)
+
+    @asyncio.coroutine
+    def flushSerialInput(self):
+        self.dev.flushInput()
+
+    @asyncio.coroutine
+    def sendRESET(self):
         super().write(RESET_PACKET)
 
-        self.log.info("Write the status packet in 0.1 seconds. (blocking)")
-        self.loop.call_later(0.1, super().write, STATUS_PACKET)
+    @asyncio.coroutine
+    def sendMODE(self):
+        super().write(MODE_PACKET)
 
-        self.log.info("Adding the queued writer in 0.2 seconds.")
-        self.loop.call_later(
-            0.2, self.loop.add_writer, self.dev.fd, self._writer)
-
-        self.log.info("Adding mode packet to the write queue.")
-        self.write(MODE_PACKET)
+    @asyncio.coroutine
+    def sendSTATUS(self):
+        super().write(STATUS_PACKET)
 
     def _writer(self):
         """We have been called to write! Take the oldest item off the queue
