@@ -115,20 +115,24 @@ class AsyncioTransportTestCase(TestCase):
             unit_log.warning.assert_called_once_with(
                 "READ : Empty packet (Got \\x00)")
 
+    @mock.patch('rfxcom.transport.asyncio.AsyncioTransport.do_callback')
     @mock.patch('asyncio.AbstractEventLoop')
     @mock.patch('serial.Serial')
-    def test_transport_read(self, device, loop):
+    def test_transport_read(self, device, loop, callback):
 
         unit = AsyncioTransport(device, loop, callback=mock.Mock())
 
-        call_map = {
-            (): b'\x02',
-            (2, ): b'\x01\x01'
-        }
+        def fake_read(*x):
+            data = {
+                (): b'\x02',
+                (2, ): b'\x01\x01'
+            }
+            return data[x]
+        device.read.side_effect = fake_read
 
-        device.read = lambda *x: call_map[x]
-
-        self.assertEquals(unit.read(), b'\x02\x01\x01')
+        expected_result = b'\x02\x01\x01'
+        self.assertEquals(unit.read(), expected_result)
+        callback.assert_called_once_with(expected_result)
 
     @mock.patch('asyncio.AbstractEventLoop')
     @mock.patch('serial.Serial')
@@ -144,3 +148,14 @@ class AsyncioTransportTestCase(TestCase):
         unit._writer()
 
         device.write.assert_called_once_with(payload)
+
+    @mock.patch('asyncio.AbstractEventLoop')
+    @mock.patch('serial.Serial')
+    def test_transport_doesnt_write_with_emtpy_queue(self, device, loop):
+        unit = AsyncioTransport(device, loop, callback=mock.Mock())
+
+        # Call write and verify it was added to the queue
+        unit.write_queue = []
+        unit._writer()
+
+        self.assertFalse(device.write.called)
