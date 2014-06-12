@@ -28,6 +28,13 @@ class BaseTransportTestCase(TestCase):
         self.transport = BaseTransport(device=self.device, callback=_callback)
         self.bytes_array = bytearray(b'\x11\x5A\x01\x00\x2E\xB2\x03\x00\x00')
 
+    def test_constructor(self):
+
+        mock = Mock()
+        device = '/dev/serial/...'
+        BaseTransport(device, callback=_callback, SerialClass=mock)
+        mock.assert_called_once_with(device, 38400, timeout=1)
+
     def test_format_packet(self):
 
         bytes_array = bytearray(b'\x11\x5A\x01\x00\x2E\xB2\x03\x00\x00')
@@ -124,18 +131,23 @@ class BaseTransportTestCase(TestCase):
 
     def test_reader(self):
 
-        self.device.read.return_value = self.elec_packet
+        call_map = {
+            (): [self.elec_packet[0], ],
+            (17, ): self.elec_packet[1:]
+        }
 
-        self.transport.read()
+        self.device.read = lambda *x: call_map[x]
+
+        self.assertEquals(self.transport.read(), bytearray(self.elec_packet))
 
     def test_reader_empty(self):
 
         self.device.read.return_value = ''
 
-        self.transport.read()
+        self.assertEquals(self.transport.read(), None)
 
     def test_read_blank(self):
 
         self.device.read.return_value = b'\x00'
 
-        self.transport.read()
+        self.assertEquals(self.transport.read(), None)

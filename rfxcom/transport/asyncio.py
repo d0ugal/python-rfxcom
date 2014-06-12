@@ -102,3 +102,4 @@ class AsyncioTransport(BaseTransport):
 
         self.log.info("READ : %s" % self.format_packet(pkt))
         self.do_callback(pkt)
+        return pkt
