@@ -50,7 +50,7 @@ root of the repository.
 Documentation
 -------------
 
-`View the documentation of Read The Docs`_.
+`View the documentation on Read The Docs`_.
 
 
 Quick Example
