@@ -111,7 +111,7 @@ verify all pull requests.
 .. _Temperature and humidity sensors: http://rfxcom.readthedocs.org/en/latest/ref/protocol/temphumidity.html
 .. _tox: https://pypi.python.org/pypi/tox
 .. _Travis CI: https://travis-ci.org/d0ugal/python-rfxcom
-.. _View the documentation of Read The Docs: http://rfxcom.readthedocs.org/en/latest/
+.. _View the documentation on Read The Docs: http://rfxcom.readthedocs.org/en/latest/
 
 .. [#] However, given enough interest previous versions can be supported:
    https://github.com/d0ugal/python-rfxcom/pull/1
