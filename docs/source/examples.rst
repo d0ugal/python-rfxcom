@@ -1,5 +1,5 @@
-RFXCom Examples
-===============
+Examples
+========
 
 
 .. code-block:: python

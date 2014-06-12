@@ -17,7 +17,6 @@ RFXCOM
 
 A Python library for working with your `RFXTrx`_ for automation projects.
 
-
 This library is designed to work with Python 3.3+ [#]_ and `asyncio`_ (but
 other transports can be implemented). Currently it is primarily used by the
 `home`_ project, a dashboard for managing and visualising your home automation
@@ -27,10 +26,10 @@ This library is relatively new and thus the number of devices are limited to
 those that @d0ugal owns. This means, that the current list of fully supported
 protocols are:
 
-1. Status Packets from the `RFXTrx`_ itself.
-2. Energy usage sensors (such as the Owl CM119/160 and Owl CM180)
-3. Temperature and humidity sensors (such as the Oregon THGN132)
-4. Lighting and power control devices from LightwaveRF
+1. `Status Packets`_ from the `RFXTrx`_ itself.
+2. `Energy usage sensors`_ (such as the Owl CM119/160 and Owl CM180)
+3. `Temperature and humidity sensors`_ (such as the Oregon THGN132)
+4. `Lighting and power control`_ devices from LightwaveRF
 
 If you want to use a device and you don't think its supported or you are unsure
 then please `open an issue`_.
@@ -102,13 +101,17 @@ people will only have one installed. We use the brilliant `Travis CI`_ to
 verify all pull requests.
 
 .. _asyncio: https://docs.python.org/3/library/asyncio.html
+.. _Energy usage sensors: http://rfxcom.readthedocs.org/en/latest/ref/protocol/elec.html
 .. _home: https://github.com/d0ugal/home
+.. _Lighting and power control: http://rfxcom.readthedocs.org/en/latest/ref/protocol/lighting5.html
 .. _open an issue: https://github.com/d0ugal/python-rfxcom/issues/new
+.. _output for energy usage sensors: http://rfxcom.readthedocs.org/en/latest/ref/protocol/elec.html
 .. _RFXTrx: http://www.rfxcom.com/store/Transceivers/14103
+.. _Status Packets: http://rfxcom.readthedocs.org/en/latest/ref/protocol/status.html
+.. _Temperature and humidity sensors: http://rfxcom.readthedocs.org/en/latest/ref/protocol/temphumidity.html
 .. _tox: https://pypi.python.org/pypi/tox
 .. _Travis CI: https://travis-ci.org/d0ugal/python-rfxcom
 .. _View the documentation of Read The Docs: http://rfxcom.readthedocs.org/en/latest/
-.. _output for energy usage sensors: http://rfxcom.readthedocs.org/en/latest/ref/protocol/elec.html
 
 .. [#] However, given enough interest previous versions can be supported:
    https://github.com/d0ugal/python-rfxcom/pull/1
