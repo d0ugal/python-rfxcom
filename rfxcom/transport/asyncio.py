@@ -23,18 +23,19 @@ class AsyncioTransport(BaseTransport):
         loop.add_writer(self.dev.fd, self.setup)
 
     def setup(self):
-        """ Perform setup tasks
+        """Performs the RFXtrx initialisation protocol.
 
-        - Send a reset to the rfxtrx
-        - Attach a reader to the eventloop
-        - Send a status packet to the rfxtrx (No earlier than 0.05 seconds
-          after the reset packet and no later than 10 seconds after)
+        Currently this is the rough workflow of the interactions with the
+        RFXtrx. We also do a few extra things - flush the buffer, and attach
+        readers/writers to the asyncio loop.
 
-        The setup method is blocking, because the series of events is important
-        and we can't do anything until its done anyway. After that it removes
-        itself and adds the _writer method which then writes in the event loop
-        without blocking.
+        1. Write a RESET packet (write all zeros)
+        2. Wait at least 50ms and less than 9000ms
+        3. Write the STATUS packet to verify the device is up.
+        4. Receive status response
+        5. Write the MODE packet to enable or disabled the required protocols.
         """
+
         self.log.info("Removing setup writer.")
         self.loop.remove_writer(self.dev.fd)
 
