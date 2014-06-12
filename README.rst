@@ -1,18 +1,21 @@
 RFXCOM
 ======
 
-.. image:: http://img.shields.io/pypi/v/rfxcom.svg?style=flat
-   :target: https://pypi.python.org/pypi/rfxcom
-
 .. image:: http://img.shields.io/travis/d0ugal/python-rfxcom.svg?style=flat
    :alt: Build Status
    :target: https://travis-ci.org/d0ugal/python-rfxcom
 
-.. image:: http://img.shields.io/pypi/dm/rfxcom.svg?style=flat
+.. image:: http://img.shields.io/coveralls/d0ugal/python-rfxcom.svg?style=flat
+   :alt: Coverage
+   :target: https://coveralls.io/r/d0ugal/python-rfxcom?branch=master
+
+.. image:: http://img.shields.io/pypi/v/rfxcom.svg?style=flat
+   :alt: PyPI Version
    :target: https://pypi.python.org/pypi/rfxcom
 
-.. image:: http://img.shields.io/coveralls/d0ugal/python-rfxcom.svg?style=flat
-   :target: https://coveralls.io/r/d0ugal/python-rfxcom?branch=master
+.. image:: http://img.shields.io/pypi/dm/rfxcom.svg?style=flat
+   :alt: PyPI Downloads
+   :target: https://pypi.python.org/pypi/rfxcom
 
 
 A Python library for working with your `RFXTrx`_ for automation projects.
