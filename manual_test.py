@@ -40,21 +40,8 @@ LOGGING = {
 }
 
 
-def status_handler(packet):
-    return
-
-
-def elec_handler(packet):
+def printer(packet):
     print(packet)
-
-
-def temp_humidity_handler(packet):
-    return
-
-
-def default_callback(packet):
-    print("???? :", packet)
-
 
 def write(rfxcom):
     return
@@ -72,10 +59,10 @@ def main():
 
     try:
         rfxcom = AsyncioTransport(args.device, loop, callbacks={
-            protocol.Status: status_handler,
-            protocol.Elec: elec_handler,
-            protocol.TempHumidity: temp_humidity_handler,
-            '*': default_callback,
+            protocol.Status: printer,
+            protocol.Elec: printer,
+            protocol.TempHumidity: printer,
+            '*': printer,
         })
         loop.call_later(2, partial(write, rfxcom))
         loop.run_forever()
