@@ -51,17 +51,14 @@ class AsyncioTransport(BaseTransport):
         self.log.info("Writing the reset packet to the RFXtrx. (blocking)")
         yield from self.sendRESET()
 
-        self.log.info("Wating 0.1s")
-        yield from asyncio.sleep(0.1)
+        self.log.info("Wating 0.4s")
+        yield from asyncio.sleep(0.4)
 
         self.log.info("Write the status packet (blocking)")
         yield from self.sendSTATUS()
 
-        # FIXME sleep as a temporary measure, as the MODE might be sent before
-        # STATUS has an answer
-        yield from asyncio.sleep(0.2)
         # TODO receive status response, compare it with the needed MODE and
-        # request a new MODE if required. Currenly MODE is always sent.
+        # request a new MODE if required. Currently MODE is always sent.
 
         self.log.info("Adding mode packet to the write queue (blocking)")
         yield from self.sendMODE()
