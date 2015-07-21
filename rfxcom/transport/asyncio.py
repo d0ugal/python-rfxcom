@@ -18,12 +18,9 @@ class AsyncioTransport(BaseTransport):
                          SerialClass=SerialClass)
 
         self.loop = loop
-        self.write_queue = []
+        asyncio.async(self._setup())
 
-        self.log.info("Attaching writer for setup.")
-        loop.add_writer(self.dev.fd, self.setup)
-
-    def setup(self):
+    def _setup(self):
         """Performs the RFXtrx initialisation protocol in a Future.
 
         Currently this is the rough workflow of the interactions with the
@@ -36,12 +33,6 @@ class AsyncioTransport(BaseTransport):
         4. Receive status response
         5. Write the MODE packet to enable or disabled the required protocols.
         """
-        self.log.info("Removing setup writer.")
-        self.loop.remove_writer(self.dev.fd)
-
-        asyncio.async(self._setup())
-
-    def _setup(self):
         self.log.info("Adding reader to prepare to receive.")
         self.loop.add_reader(self.dev.fd, self.read)
 
@@ -63,9 +54,6 @@ class AsyncioTransport(BaseTransport):
         self.log.info("Adding mode packet to the write queue (blocking)")
         yield from self.sendMODE()
 
-        self.log.info("Adding the queued writer next loop iteration.")
-        self.loop.call_soon(self.loop.add_writer, self.dev.fd, self._writer)
-
     @asyncio.coroutine
     def flushSerialInput(self):
         self.dev.flushInput()
@@ -81,22 +69,6 @@ class AsyncioTransport(BaseTransport):
     @asyncio.coroutine
     def sendSTATUS(self):
         super().write(STATUS_PACKET)
-
-    def _writer(self):
-        """We have been called to write! Take the oldest item off the queue
-        and use the write method on BaseTransport.
-        """
-        l = len(self.write_queue)
-
-        if l > 0:
-            self.log.debug("Serving from write queue (length %s)" % l)
-            super().write(self.write_queue.pop(0))
-
-    def write(self, data):
-        """Add a data packet to the write queue. In this case, its a simple
-        list. which is then consumed. This method is as light as possible.
-        """
-        self.write_queue.append(data)
 
     def do_callback(self, pkt):
         """Add the callback to the event loop, we use call soon because we just
