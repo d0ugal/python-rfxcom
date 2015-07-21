@@ -103,7 +103,20 @@ class AsyncioTransport(BaseTransport):
         want it to be called at some point, but don't care when particularly.
         """
         callback, parser = self.get_callback_parser(pkt)
-        self.loop.call_soon(callback, parser)
+
+        if asyncio.iscoroutinefunction(callback):
+            self.loop.call_soon_threadsafe(self._do_async_callback,
+                                           callback, parser)
+        else:
+            self.loop.call_soon(callback, parser)
+
+    @staticmethod
+    def _do_async_callback(callback, parser):
+        """ Call a the callback coroutine function in the event loop
+        :param callback: Coroutine function
+        :param parser: Packet parser found for received packet
+        """
+        asyncio.async(callback(parser))
 
     def read(self):
         """We have been called to read! As a consumer, continue to read for

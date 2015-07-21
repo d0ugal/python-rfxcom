@@ -1,6 +1,6 @@
 """
-Temperture and Humidity sensors
-===============================
+Temperature and Humidity sensors
+================================
 
 """
 

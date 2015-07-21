@@ -134,6 +134,30 @@ class AsyncioTransportTestCase(TestCase):
         self.assertEquals(unit.read(), expected_result)
         callback.assert_called_once_with(expected_result)
 
+    @mock.patch(
+        'rfxcom.transport.asyncio.AsyncioTransport.get_callback_parser')
+    @mock.patch('asyncio.AbstractEventLoop')
+    @mock.patch('serial.Serial')
+    def test_transport_do_callback(self, device, loop, get_parser):
+
+        cb = mock.Mock()
+        get_parser.return_value = (cb, "test")
+
+        unit = AsyncioTransport(device, loop, callback=mock.Mock())
+
+        def fake_read(*x):
+            data = {
+                (): b'\x02',
+                (2, ): b'\x01\x01'
+            }
+            return data[x]
+        device.read.side_effect = fake_read
+
+        expected_result = b'\x02\x01\x01'
+        self.assertEquals(unit.read(), expected_result)
+        loop.call_soon_threadsafe.assert_called_once_with(
+            AsyncioTransport._do_async_callback, cb, "test")
+
     @mock.patch('asyncio.AbstractEventLoop')
     @mock.patch('serial.Serial')
     def test_transport_write_from_queue(self, device, loop):
