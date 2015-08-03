@@ -42,24 +42,12 @@ class AsyncioTransportTestCase(TestCase):
 
     """AsyncioTransport test case."""
 
-    @mock.patch('asyncio.AbstractEventLoop')
-    @mock.patch('serial.Serial')
-    def test_transport_constructor(self, device, loop):
-        unit = AsyncioTransport(device, loop, callback=mock.Mock())
-        loop.add_writer.assert_called_once_with(device.fd, unit.setup)
-
     @mock.patch('rfxcom.transport.asyncio.AsyncioTransport._setup')
     @mock.patch('asyncio.async')
     @mock.patch('asyncio.AbstractEventLoop')
     @mock.patch('serial.Serial')
     def test_transport_setup(self, device, loop, async, _setup):
-        unit = AsyncioTransport(device, loop, callback=mock.Mock())
-        # reset mocks which have been 'called' by the constructor
-        device.reset_mock()
-        loop.reset_mock()
-        unit.setup()
-
-        loop.remove_writer.assert_called_once_with(device.fd)
+        AsyncioTransport(device, loop, callback=mock.Mock())
         async.assert_called_once_with(_setup())
 
     @mock.patch('rfxcom.transport.asyncio.AsyncioTransport.sendRESET')
@@ -86,8 +74,6 @@ class AsyncioTransportTestCase(TestCase):
         self.assertLess(slept_time, 9)
         mode.assert_called_once_with()
         status.assert_called_once_with()
-        loop.call_soon.assert_called_once_with(loop.add_writer, device.fd,
-                                               unit._writer)
 
     @mock.patch('asyncio.AbstractEventLoop')
     @mock.patch('serial.Serial')
@@ -137,25 +123,9 @@ class AsyncioTransportTestCase(TestCase):
     @mock.patch('asyncio.AbstractEventLoop')
     @mock.patch('serial.Serial')
     def test_transport_write_from_queue(self, device, loop):
-
         payload = b'\x01\x01'
         unit = AsyncioTransport(device, loop, callback=mock.Mock())
 
-        # Call write and verify it was added to the queue
         unit.write(payload)
-        self.assertIn(payload, unit.write_queue)
-
-        unit._writer()
 
         device.write.assert_called_once_with(payload)
-
-    @mock.patch('asyncio.AbstractEventLoop')
-    @mock.patch('serial.Serial')
-    def test_transport_doesnt_write_with_emtpy_queue(self, device, loop):
-        unit = AsyncioTransport(device, loop, callback=mock.Mock())
-
-        # Call write and verify it was added to the queue
-        unit.write_queue = []
-        unit._writer()
-
-        self.assertFalse(device.write.called)
