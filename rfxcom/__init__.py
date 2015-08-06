@@ -7,4 +7,4 @@ The base package used by the rfxcom library.
 """
 
 #: A PEP 396 compatible version string.
-__version__ = '0.3.0'
+__version__ = '0.4.0'
