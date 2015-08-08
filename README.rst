@@ -86,6 +86,25 @@ receives. For example, see what it will `output for energy usage sensors`_.::
     finally:
         loop.close()
 
+You can also use a coroutine as callback for AsyncioTransport::
+
+    from asyncio import get_event_loop, coroutine
+    from rfxcom.transport import AsyncioTransport
+
+    dev_name = '/dev/serial/by-id/usb-RFXCOM_RFXtrx433_A1WYT9NA-if00-port0'
+    loop = get_event_loop()
+
+    @coroutine
+    def handler(packet):
+        print(packet)
+        yield from some_io()
+
+    try:
+        rfxcom = AsyncioTransport(dev_name, loop, callback=handler)
+        loop.run_forever()
+    finally:
+        loop.close()
+
 
 Contributing
 ------------
