@@ -97,7 +97,7 @@ You can also use a coroutine as callback for AsyncioTransport::
     @coroutine
     def handler(packet):
         print(packet)
-        yield from some_io()
+        yield from some_io(packet)
 
     try:
         rfxcom = AsyncioTransport(dev_name, loop, callback=handler)
