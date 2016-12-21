@@ -2,6 +2,7 @@ from unittest import TestCase
 
 from rfxcom.protocol.base import BasePacketHandler
 from rfxcom.exceptions import InvalidPacketLength
+from rfxcom.exceptions import MalformedPacket
 
 
 class BaseTestCase(TestCase):
@@ -25,6 +26,14 @@ class BaseTestCase(TestCase):
             self.parser.validate_packet(data)
 
         self.assertFalse(self.parser.can_handle(data))
+
+    def test_malformed_packet(self):
+
+        data = self.data[0:3]
+        data[0] = 2
+
+        with self.assertRaises(MalformedPacket):
+            self.parser.validate_packet(data)
 
     def test_not_implemented(self):
 

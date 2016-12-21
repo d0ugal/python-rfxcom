@@ -5,6 +5,7 @@ Lighting 5
 """
 
 from rfxcom.protocol.base import BasePacketHandler
+from rfxcom.protocol.rfxpacketutils import RfxPacketUtils
 
 
 SUB_TYPE_COMMANDS = {
@@ -95,7 +96,7 @@ class Lighting5(BasePacketHandler):
     7       Unit Code
     8       Command
     9       Level
-    10      Filler and RSSI
+    10      RSSI and Filler
     ====    ====
     """
 
@@ -107,7 +108,7 @@ class Lighting5(BasePacketHandler):
             0x14: "Lighting5"
         }
 
-        self.SUB_TYPES = {
+        self.PACKET_SUBTYPES = {
             0x00: "LightwaveRF, Siemens",
             0x01: "EMW100 GAO/Everflourish",
             0x02: "BBSB new types",
@@ -147,28 +148,24 @@ class Lighting5(BasePacketHandler):
 
         self.validate_packet(data)
 
-        packet_length = data[0]
-        packet_type = data[1]
-        sub_type = data[2]
-        sequence_number = data[3]
+        results = self.parse_header_part(data)
+        sub_type = results['packet_subtype']
+
         id_ = self.dump_hex(data[4:7])
         unit_code = data[7]
         command = data[8]
         command_text = SUB_TYPE_COMMANDS.get(sub_type, {}).get(command)
         level = data[9]
-        rssi = data[10]
 
-        return {
-            'packet_length': packet_length,
-            'packet_type': packet_type,
-            'packet_type_name': self.PACKET_TYPES.get(packet_type),
-            'sequence_number': sequence_number,
-            'sub_type': sub_type,
-            'sub_type_name': self.SUB_TYPES.get(sub_type),
+        sensor_specific = {
             'id': id_,
             'unit_code': unit_code,
             'command': command,
             'command_text': command_text,
-            'level': level,
-            'rssi': rssi,
+            'level': level
         }
+
+        results.update(RfxPacketUtils.parse_signal_upper(data[10]))
+        results.update(sensor_specific)
+
+        return results
