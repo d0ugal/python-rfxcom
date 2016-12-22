@@ -105,7 +105,7 @@ class Lighting5(BasePacketHandler):
         super().__init__(*args, **kwargs)
 
         self.PACKET_TYPES = {
-            0x14: "Lighting5"
+            0x14: "Lighting5 sensors"
         }
 
         self.PACKET_SUBTYPES = {
@@ -119,9 +119,9 @@ class Lighting5(BasePacketHandler):
         }
 
     def parse(self, data):
-        """Parse a 10 byte packet in the Lighting5 format and return a
+        """Parse a 11 bytes packet in the Lighting5 format and return a
         dictionary containing the data extracted. An example of a return value
-        would be
+        would be:
 
         .. code-block:: python
 
@@ -129,14 +129,15 @@ class Lighting5(BasePacketHandler):
                 'id': "0xF394AB",
                 'packet_length': 10,
                 'packet_type': 20,
+                'packet_type_name': 'Lighting5 sensors',
                 'sequence_number': 173,
-                'sub_type': 0,
-                'sub_type_name': "LightwaveRF, Siemens",
+                'packet_subtype': 0,
+                'packet_subtype_name': "LightwaveRF, Siemens",
                 'unit_code': 1,
                 'command': 1,
                 'command_text': "On",
                 'level': 0,
-                'rssi': 96,
+                'signal_level': 9,
             }
 
         :param data: bytearray to be parsed

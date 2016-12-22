@@ -75,7 +75,9 @@ class Elec(BasePacketHandler):
                 (bytes_[4] << 8) + bytes_[4])
 
     def parse(self, data):
-        """Parse the packet and return a dictionary with the following format.
+        """Parse a 18 bytes packet in the Electricity format and return a
+        dictionary containing the data extracted. An example of a return value
+        would be:
 
         .. code-block:: python
 
@@ -85,10 +87,13 @@ class Elec(BasePacketHandler):
                 'id': "0x2EB2",
                 'packet_length': 17,
                 'packet_type': 90,
+                'packet_type_name': 'Energy usage sensors',
                 'sequence_number': 0,
-                'sub_type': 1,
-                'sub_type_name': "CM119/160",
+                'packet_subtype': 1,
+                'packet_subtype_name': "CM119/160",
                 'total_watts': 920825.1947099693,
+                'signal_level': 9,
+                'battery_level': 6,
             }
 
         :param data: bytearray to be parsed

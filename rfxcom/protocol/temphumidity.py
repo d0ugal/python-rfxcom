@@ -51,7 +51,26 @@ class TempHumidity(BasePacketHandler):
         }
 
     def parse(self, data):
-        """Parse a 10 byte packet in the temp format.
+        """Parse a 11 bytes packet in the TemperatureHumidity format and return a
+        dictionary containing the data extracted. An example of a return value
+        would be:
+
+        .. code-block:: python
+
+            {
+                'id': "0x2EB2",
+                'packet_length': 10,
+                'packet_type': 82,
+                'packet_type_name': 'Temperature and humidity sensors',
+                'sequence_number': 0,
+                'packet_subtype': 2,
+                'packet_subtype_name': "THGR810, THGN801, THGN800",
+                'temperature': 21.3,
+                'humidity': 91,
+                'humidity_status': "Wet"
+                'signal_level': 9,
+                'battery_level': 6,
+            }
 
         :param data: bytearray to be parsed
         :type data: bytearray

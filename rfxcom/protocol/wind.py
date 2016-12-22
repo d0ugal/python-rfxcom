@@ -52,7 +52,28 @@ class Wind(BasePacketHandler):
         }
 
     def parse(self, data):
-        """Parse a 17 bytes packet in the temp format.
+        """Parse a 17 bytes packet in the Wind format and return a
+        dictionary containing the data extracted. An example of a return value
+        would be:
+
+        .. code-block:: python
+
+            {
+                'id': "0x2EB2",
+                'packet_length': 16,
+                'packet_type': 86,
+                'packet_type_name': 'Wind sensors',
+                'sequence_number': 0,
+                'packet_subtype': 4,
+                'packet_subtype_name': "TFA",
+                'temperature': 17.3,
+                'direction': 120,
+                'wind_gust': 11,
+                'av_speed': 12,
+                'wind_chill': 10,
+                'signal_level': 9,
+                'battery_level': 6,
+            }
 
         :param data: bytearray to be parsed
         :type data: bytearray

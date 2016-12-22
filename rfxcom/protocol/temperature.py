@@ -47,7 +47,24 @@ class Temperature(BasePacketHandler):
         }
 
     def parse(self, data):
-        """Parse a 9 bytes packet in the temp format.
+        """Parse a 9 bytes packet in the Temperature format and return a
+        dictionary containing the data extracted. An example of a return value
+        would be:
+
+        .. code-block:: python
+
+            {
+                'id': "0x2EB2",
+                'packet_length': 8,
+                'packet_type': 80,
+                'packet_type_name': 'Temperature sensors',
+                'sequence_number': 0,
+                'packet_subtype': 1,
+                'packet_subtype_name': "THR128/138, THC138",
+                'temperature': 21.3,
+                'signal_level': 9,
+                'battery_level': 6,
+            }
 
         :param data: bytearray to be parsed
         :type data: bytearray

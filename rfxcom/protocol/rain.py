@@ -50,7 +50,25 @@ class Rain(BasePacketHandler):
         }
 
     def parse(self, data):
-        """Parse a 12 bytes packet in the temp format.
+        """Parse a 12 bytes packet in the Rain format and return a
+        dictionary containing the data extracted. An example of a return value
+        would be:
+
+        .. code-block:: python
+
+            {
+                'id': "0x2EB2",
+                'packet_length': 11,
+                'packet_type': 85,
+                'packet_type_name': 'Rain sensors',
+                'sequence_number': 0,
+                'packet_subtype': 1,
+                'packet_subtype_name': "RGR126/682/918",
+                'rain_rate': 5,
+                'rain_total': 130.0,
+                'signal_level': 9,
+                'battery_level': 6,
+            }
 
         :param data: bytearray to be parsed
         :type data: bytearray

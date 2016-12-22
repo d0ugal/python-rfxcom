@@ -24,7 +24,7 @@ class Lighting5TestCase(TestCase):
             'id': "0xF394AB",
             'packet_length': 10,
             'packet_type': 20,
-            'packet_type_name': "Lighting5",
+            'packet_type_name': "Lighting5 sensors",
             'packet_subtype': 0,
             'packet_subtype_name': "LightwaveRF, Siemens",
             'sequence_number': 173,
