@@ -126,7 +126,7 @@ class BasePacketHandler(BasePacket):
 
         - The length of the packet is equal to the first byte.
         - The second byte is in the set of defined PACKET_TYPES for this class.
-        - The third byte is in the set of defined PACKET_SUBTYPES for this class.
+        - The third byte is in the set of this class defined PACKET_SUBTYPES.
 
         If one or more of these conditions isn't met then we have a packet that
         isn't valid or at least isn't understood by this handler.
@@ -172,8 +172,8 @@ class BasePacketHandler(BasePacket):
             )
 
         # Validate Packet Type.
-        # This specifies the family of devices. Check its one of the supported
-        # Elec2 packet types
+        # This specifies the family of devices.
+        # Check it is one of the supported packet types
         packet_type = data[1]
 
         if self.PACKET_TYPES and packet_type not in self.PACKET_TYPES:
@@ -183,13 +183,14 @@ class BasePacketHandler(BasePacket):
                 % (types, packet_type)
             )
 
-        # Validate Sub Type.
-        # The first byte in the packet should be equal to the number of
-        # remaining bytes (i.e. length excluding the first byte).
+        # Validate Packet Subtype.
+        # This specifies the sub-family of devices.
+        # Check it is one of the supported packet subtypes for current type
         sub_type = data[2]
 
         if self.PACKET_SUBTYPES and sub_type not in self.PACKET_SUBTYPES:
-            types = ",".join("0x{:02x}".format(pt) for pt in self.PACKET_SUBTYPES)
+            types = \
+                ",".join("0x{:02x}".format(pt) for pt in self.PACKET_SUBTYPES)
             raise UnknownPacketSubtype(
                 "Expected packet type to be one of [%s] but recieved %s"
                 % (types, sub_type))

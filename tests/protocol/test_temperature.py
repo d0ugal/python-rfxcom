@@ -25,7 +25,8 @@ class TemperatureTestCase(TestCase):
             'packet_type_name': 'Temperature sensors',
             'sequence_number': 17,
             'packet_subtype': 2,
-            'packet_subtype_name': 'THC238/268,THN132,THWR288,THRN122,THN122,AW129/131',
+            'packet_subtype_name':
+                'THC238/268,THN132,THWR288,THRN122,THN122,AW129/131',
             'temperature': 16.7,
             'id': '0x7002',
             # 'channel': 2, TBC
@@ -56,7 +57,7 @@ class TemperatureTestCase(TestCase):
             'signal_level': 5,
             'battery_level': 9
         })
-        
+
         self.assertEquals(str(self.parser), "<Temperature ID:0xAE01>")
 
     def test_parse_bytes_negative_temp(self):
@@ -80,7 +81,7 @@ class TemperatureTestCase(TestCase):
             'signal_level': 5,
             'battery_level': 9
         })
-        
+
         self.assertEquals(str(self.parser), "<Temperature ID:0xAE01>")
 
     def test_validate_bytes_short(self):

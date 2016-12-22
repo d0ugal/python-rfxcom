@@ -81,6 +81,7 @@ class UltraVioletTestCase(TestCase):
         })
 
         self.assertEquals(str(self.parser), "<UltraViolet ID:0x2EB2>")
+
     def test_validate_bytes_short(self):
 
         data = self.data[:1]
