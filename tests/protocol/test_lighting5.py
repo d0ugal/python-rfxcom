@@ -24,15 +24,15 @@ class Lighting5TestCase(TestCase):
             'id': "0xF394AB",
             'packet_length': 10,
             'packet_type': 20,
-            'packet_type_name': "Lighting5",
+            'packet_type_name': "Lighting5 sensors",
+            'packet_subtype': 0,
+            'packet_subtype_name': "LightwaveRF, Siemens",
             'sequence_number': 173,
-            'sub_type': 0,
-            'sub_type_name': "LightwaveRF, Siemens",
             'unit_code': 1,
             'command': 1,
             'command_text': "On",
             'level': 0,
-            'rssi': 96,
+            'signal_level': 6
         })
 
         self.assertEquals(str(self.parser), "<Lighting5 ID:0xF394AB>")

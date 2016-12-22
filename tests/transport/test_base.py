@@ -52,7 +52,7 @@ class BaseTransportTestCase(TestCase):
             (_callback, ANY)
         )
 
-    def test_setup_callbacks_mutli(self):
+    def test_setup_callbacks_multi(self):
 
         # Setup - handler for Elec and fallback for the rest.
         parser = BaseTransport(device=self.device, callbacks={

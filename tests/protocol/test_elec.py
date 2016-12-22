@@ -6,7 +6,7 @@ from rfxcom.exceptions import (InvalidPacketLength, UnknownPacketSubtype,
                                UnknownPacketType)
 
 
-class Elec2TestCase(TestCase):
+class ElecTestCase(TestCase):
 
     def setUp(self):
 
@@ -28,9 +28,11 @@ class Elec2TestCase(TestCase):
             'packet_type': 90,
             'packet_type_name': 'Energy usage sensors',
             'sequence_number': 0,
-            'sub_type': 1,
-            'sub_type_name': "CM119/160",
+            'packet_subtype': 1,
+            'packet_subtype_name': "CM119/160",
             'total_watts': 920825.1947099693,
+            'battery_level': 9,
+            'signal_level': 6
         })
 
         self.assertEquals(str(self.parser), "<Elec ID:0x2EB2>")

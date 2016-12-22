@@ -10,8 +10,9 @@ Handlers.
 from datetime import datetime
 from logging import getLogger
 
-from rfxcom.exceptions import (InvalidPacketLength, UnknownPacketType,
-                               UnknownPacketSubtype, RFXComException)
+from rfxcom.exceptions import (InvalidPacketLength, MalformedPacket,
+                               UnknownPacketType, UnknownPacketSubtype,
+                               RFXComException)
 
 
 class BasePacket:
@@ -27,7 +28,7 @@ class BasePacket:
 
         self.log = getLogger('rfxcom.protocol.%s' % self.__class__.__name__)
         self.PACKET_TYPES = {}
-        self.SUB_TYPES = {}
+        self.PACKET_SUBTYPES = {}
 
     def dump_hex(self, data):
         """Given some bytes return the hex representation.
@@ -53,6 +54,34 @@ class BasePacket:
 
         """
         raise NotImplementedError()
+
+    def parse_header_part(self, data):
+        """Extracts and converts the RFX common header part of all valid
+        packets to a plain dictionary. RFX header part is the 4 bytes prior
+        the sensor vendor specific data part.
+
+        The RFX common header part contains respectively:
+        - packet length
+        - packet type
+        - packet sub-type
+        - sequence number
+
+        :param data: bytearray of received data
+        :type data: bytearray
+
+        """
+        packet_length = data[0]
+        packet_type = data[1]
+        packet_subtype = data[2]
+        sequence_number = data[3]
+        return {
+            'packet_length': packet_length,
+            'packet_type': packet_type,
+            'packet_type_name': self.PACKET_TYPES.get(packet_type),
+            'packet_subtype': packet_subtype,
+            'packet_subtype_name': self.PACKET_SUBTYPES.get(packet_subtype),
+            'sequence_number': sequence_number
+        }
 
     def load(self, data):
         """This is the entrance method for all data which is used to store the
@@ -97,7 +126,7 @@ class BasePacketHandler(BasePacket):
 
         - The length of the packet is equal to the first byte.
         - The second byte is in the set of defined PACKET_TYPES for this class.
-        - The third byte is in the set of defined SUB_TYPES for this class.
+        - The third byte is in the set of this class defined PACKET_SUBTYPES.
 
         If one or more of these conditions isn't met then we have a packet that
         isn't valid or at least isn't understood by this handler.
@@ -131,9 +160,20 @@ class BasePacketHandler(BasePacket):
                 % (expected_length, len(data))
             )
 
+        # Validate minimal length.
+        # The packet contains at least the RFX header:
+        #  packet_length (1 byte) + packet_type (1 byte)
+        #  + packet_subtype (1 byte) + sequence_number (1 byte)
+        if expected_length < 4:
+            raise MalformedPacket(
+                    "Expected packet length to be larger than 4 bytes but \
+                    it was %s bytes"
+                    % (len(data))
+            )
+
         # Validate Packet Type.
-        # This specifies the family of devices. Check its one of the supported
-        # Elec2 packet types
+        # This specifies the family of devices.
+        # Check it is one of the supported packet types
         packet_type = data[1]
 
         if self.PACKET_TYPES and packet_type not in self.PACKET_TYPES:
@@ -143,13 +183,14 @@ class BasePacketHandler(BasePacket):
                 % (types, packet_type)
             )
 
-        # Validate Sub Type.
-        # The first byte in the packet should be equal to the number of
-        # remaining bytes (i.e. length excluding the first byte).
+        # Validate Packet Subtype.
+        # This specifies the sub-family of devices.
+        # Check it is one of the supported packet subtypes for current type
         sub_type = data[2]
 
-        if self.SUB_TYPES and sub_type not in self.SUB_TYPES:
-            types = ",".join("0x{:02x}".format(pt) for pt in self.SUB_TYPES)
+        if self.PACKET_SUBTYPES and sub_type not in self.PACKET_SUBTYPES:
+            types = \
+                ",".join("0x{:02x}".format(pt) for pt in self.PACKET_SUBTYPES)
             raise UnknownPacketSubtype(
                 "Expected packet type to be one of [%s] but recieved %s"
                 % (types, sub_type))
@@ -180,7 +221,6 @@ class Packet(BasePacket):
         return {
             'packet_length': packet_length,
             'packet_type': packet_type,
-            'sub_type': sub_type,
-            'sub_type_name': self.SUB_TYPES.get(sub_type),
+            'packet_subtype': sub_type,
             'packet': data,
         }

@@ -18,6 +18,13 @@ class PacketHandlerNotFound(RFXComException):
     """
 
 
+class MalformedPacket(RFXComException):
+    """This exception is raised when the length of the packet doesn't ensure
+    the common packet header fields be present. This then means we have too
+    few bytes to read: packet type + packet sub-type + sequence_number.
+    """
+
+
 class InvalidPacketLength(RFXComException):
     """This exception is raised when the length of the packet doesn't match
     the length given in the first byte of the packet. This then means we

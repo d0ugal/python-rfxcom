@@ -5,6 +5,7 @@ Energy Usage Sensors
 """
 
 from rfxcom.protocol.base import BasePacketHandler
+from rfxcom.protocol.rfxpacketutils import RfxPacketUtils
 
 
 class Elec(BasePacketHandler):
@@ -33,7 +34,7 @@ class Elec(BasePacketHandler):
     14      Total Watts 4
     15      Total Watts 5
     16      Total Watts 6
-    17      Battery Level and RSSI
+    17      RSSI and Battery Level
     ====    ====
     """
     def __init__(self, *args, **kwargs):
@@ -43,7 +44,7 @@ class Elec(BasePacketHandler):
         self.PACKET_TYPES = {
             0x5A: "Energy usage sensors"
         }
-        self.SUB_TYPES = {
+        self.PACKET_SUBTYPES = {
             0x01: "CM119/160",
             0x02: "CM180",
         }
@@ -74,7 +75,9 @@ class Elec(BasePacketHandler):
                 (bytes_[4] << 8) + bytes_[4])
 
     def parse(self, data):
-        """Parse the packet and return a dictionary with the following format.
+        """Parse a 18 bytes packet in the Electricity format and return a
+        dictionary containing the data extracted. An example of a return value
+        would be:
 
         .. code-block:: python
 
@@ -84,10 +87,13 @@ class Elec(BasePacketHandler):
                 'id': "0x2EB2",
                 'packet_length': 17,
                 'packet_type': 90,
+                'packet_type_name': 'Energy usage sensors',
                 'sequence_number': 0,
-                'sub_type': 1,
-                'sub_type_name': "CM119/160",
+                'packet_subtype': 1,
+                'packet_subtype_name': "CM119/160",
                 'total_watts': 920825.1947099693,
+                'signal_level': 9,
+                'battery_level': 6,
             }
 
         :param data: bytearray to be parsed
@@ -101,10 +107,6 @@ class Elec(BasePacketHandler):
 
         TOTAL_DIVISOR = 223.666
 
-        packet_length = data[0]
-        packet_type = data[1]
-        sub_type = data[2]
-        sequence_number = data[3]
         id_ = self.dump_hex(data[4:6])
         count = data[6]
         instant = data[7:11]
@@ -113,15 +115,15 @@ class Elec(BasePacketHandler):
         current_watts = self._bytes_to_uint_32(instant)
         total_watts = self._bytes_to_uint_48(total) / TOTAL_DIVISOR
 
-        return {
+        sensor_specific = {
             'count': count,
             'current_watts': current_watts,
             'id': id_,
-            'packet_length': packet_length,
-            'packet_type': packet_type,
-            'packet_type_name': self.PACKET_TYPES.get(packet_type),
-            'sequence_number': sequence_number,
-            'sub_type': sub_type,
-            'sub_type_name': self.SUB_TYPES.get(sub_type),
-            'total_watts': total_watts,
+            'total_watts': total_watts
         }
+
+        results = self.parse_header_part(data)
+        results.update(RfxPacketUtils.parse_signal_and_battery(data[17]))
+        results.update(sensor_specific)
+
+        return results

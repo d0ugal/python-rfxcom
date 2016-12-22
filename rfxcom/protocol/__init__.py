@@ -6,9 +6,15 @@ Protocol Constants
 
 from .base import Packet
 from .elec import Elec
+from .humidity import Humidity
+from .lighting2 import Lighting2
 from .lighting5 import Lighting5
+from .rain import Rain
 from .status import Status
+from .temperature import Temperature
 from .temphumidity import TempHumidity
+from .ultraviolet import UltraViolet
+from .wind import Wind
 
 #: Write all zeros to reset the RFXtrx
 RESET_PACKET = b'\x0D\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
@@ -27,8 +33,14 @@ MODE_PACKET = b'\x0D\x00\x00\x01\x03\x53\x00\x00\x0E\x2F\x00\x00\x00\x00'
 #: last one is a raw packet and will be used for any unrecognised devices.
 HANDLERS = [
     Elec,
+    Humidity,
+    Lighting2,
     Lighting5,
+    Rain,
     Status,
+    Temperature,
     TempHumidity,
+    UltraViolet,
+    Wind,
     Packet,  # At the end as we should try it last.
 ]
